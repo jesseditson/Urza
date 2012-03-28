@@ -1,0 +1,15 @@
+<div class="gifts clearfix">
+{{#each data}}
+    <div class="gift {{^available}}unavailable{{/available}} {{#if numberOfContributors}}started{{/if}}" data-giftid="{{_id}}" >
+      <img src="{{giftImageUrl}}"/>
+      <div class="info">
+          {{decorateDescription this false}}
+      </div>
+      {{#if numberOfContributors}}
+        <div class="contributorBadge">
+          {{numberOfContributors}}
+        </div>
+      {{/if}}
+    </div>
+{{/each}}
+</div>

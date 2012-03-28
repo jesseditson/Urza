@@ -1,0 +1,26 @@
+<section id="addMessage">
+  <div class="sectionBody clearfix">
+    Inviting: 
+    <div class="clearfix mb10">
+      {{#each data.friends}}
+      <div class="friendBubble">{{name}}</div>
+      {{/each}}
+    </div>
+
+<textarea name="message" id="message" rows="5">
+Hey guys, I started a gift for {{data.receiver.name}} with Grazi, and thought you might like to chip in.
+Thanks!,
+- {{user.first_name}}
+</textarea>
+
+    <div>
+      Want to save this group?<br/>
+      Add a name to use it later!
+      <input type="text" name="groupName" id="groupName" placeholder="name this group to save it"/>
+    </div>
+
+  
+    <span class="button"><a class="sendIt">Send it!</a></span>
+  </div>
+  
+</section>

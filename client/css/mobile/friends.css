@@ -1,0 +1,178 @@
+/* upcoming events */
+#upcoming .calendar {
+  overflow-x: auto;
+}
+.event,
+.user
+{
+    width: 100px;
+    height: 100px;
+    background-color: #000;
+    float: left;
+    text-align: center;
+    position: relative;
+    margin: 0 20px 20px 0;
+    box-shadow: 2px 2px 6px 1px rgba(100,100,100,.5);
+}
+.event img,
+.user img
+{
+    max-width: 100%;
+    max-height: 100%;
+}
+.event .info,
+.user .info
+{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	padding: 3%;
+	width: 94%;
+	text-align: center;
+	background: rgba(0, 0, 0, .5);
+	color: #fff;
+	font-size: 65%;
+	line-height: 120%;
+	letter-spacing: .1em;
+}
+.event .when {
+    font-size: 1.4em;
+    line-height: 130%;
+}
+
+/* just because */
+.reloadJustBecause {
+  float: right;
+  padding-right: 20px;
+  font-weight: normal;
+}
+#justBecause .subHeader {
+  margin-bottom: 10px;
+  font-size: .8em;
+  font-weight: bold;
+}
+#justBecause .user {
+  width: 83px;
+  height: 83px;
+}
+
+/* Friend finder - choose friend */
+#chooseFriend .friend,
+#chooseGroup .friend
+{
+  height: 40px;
+  margin-bottom: .2em;
+  padding: .2em;
+  border-bottom: 1px solid #ccc;
+  position: relative;
+}
+#chooseFriend .friend img,
+#chooseGroup .friend img
+{
+  max-height: 80%;
+  float: left;
+  margin: 4px 10px;
+  border-radius: 4px;
+  box-shadow: 0 0 1px 1px #333;
+}
+#chooseFriend .friend .info,
+#chooseGroup .friend .info
+{
+  font-size: .85em;
+  font-weight: bold;
+  line-height: 40px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+/* choose a gift page */
+#chooseGift .selectedUser {
+
+}
+#chooseGift .selectedUser img {
+  float: left;
+  max-width: 30px;
+  max-height: 30px;
+  padding: 5px 5px 5px 0;
+}
+#chooseGift .selectedUser .info {
+  float: left;
+  font-size: 14px;
+  line-height: 30px;
+  padding: 5px;
+}
+
+
+/* friend/group chooser for additional invites */
+#chooser {
+  z-index:1;
+  position: fixed;
+  width: 300px;
+  top:45px;
+}
+#searchLists {
+  margin-top: 326px;
+}
+#chooseGroup .selected {
+  background: #dfd;
+  border: 2px inset #8c8;
+  border-radius: 10px;
+}
+#chooseGroup .friend.selected {
+  height: 36px;
+}
+#chooseGroup .friend.selected .info {
+  line-height: 36px;
+}
+#chooseGroup .selected .info:after {
+  content: "✔";
+  float: right;
+  padding-right: 5px;
+  color: #0a0;
+}
+.group {
+  padding: 10px;
+}
+.group:not(:last-child) {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+}
+.group .info {
+  font-weight: bold;
+}
+.friendBubble {
+  float:left;
+  border-radius:10px;
+  background-color:Thistle;
+  margin:5px;
+  padding:0px 5px;
+}
+#addMessage #message {
+  width: 90%;
+  font-size: .8em;
+  margin-bottom: 10px;
+}
+#addMessage #groupName {
+  width: 80%;
+  font-size: 1em;
+  margin-bottom: 20px;
+}
+
+/* gift selected */
+#giftDetails .user,
+#giftSent .user {
+  width: 120px;
+  height: 120px;
+  margin-right: 10px;
+}
+
+/* my gifts given page */
+
+/* my account page */
+#myAccount .user {
+  width: 50px;
+  height: 50px;
+}
+#myAccount .name {
+  line-height: 50px;
+}

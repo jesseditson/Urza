@@ -1,0 +1,17 @@
+{{#if data.length}}
+<div class="sectionHeader small">
+  Choose a Group
+</div>
+<div class="sectionBody noPad clearfix">
+    <div id="allGroups">
+      {{#each data}}
+        <div class="group clearfix">
+          <div class="info">{{name}}</div>
+          {{#each users}}
+            <div class="friendBubble" data-userid="{{_id}}">{{name}}</div>
+          {{/each}}
+        </div>
+      {{/each}}
+    </div>
+</div>
+{{/if}}

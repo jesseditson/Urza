@@ -1,0 +1,60 @@
+<!-- gift -->
+<div class="giftCard" class="sectionBody clearfix">
+  <div class="to">To: <span class="whom">{{data.receiver.name}}</span></div>
+  <div class="info clearfix">
+    <img src="{{data.gift.giftImageUrl}}"/>
+    <div class="details">
+      <div class="title">
+        {{#if data.campaign}}
+          {{data.campaign.campaignHeadline}} - {{data.campaign.campaignSubHeadline}}
+        {{else}}
+          {{data.gift.client}} - {{data.gift.clientTagLine}}
+        {{/if}}
+      </div>
+      <div class="description">{{decorateDescription data.gift data.totalValue}}</div>
+    </div>
+  </div>
+
+  <div class="from clearfix">
+    <div class="label">From:</div>
+    <div class="whom">
+      <div class="gifter clearfix">
+        <img src="{{data.mine.user.picture}}" alt="{{data.mine.user.name}}" />
+        <div class="info">
+          <div class="name">{{data.mine.user.name}}</div>
+          <div class="myContribution">(My contribution: ${{data.mine.valueAdded}})</div>
+          {{#if data.mine.giftersMessage}}
+            <div class="message quote">{{data.mine.giftersMessage}}</div>
+          {{/if}}
+        </div>
+      </div>
+    
+      {{#each data.gifters}}
+          <div class="gifter clearfix">
+            <img src="{{user.picture}}" alt="{{user.name}}" />
+            <div class="info">
+              <div class="name">{{user.name}}</div>
+              {{#if giftersMessage}}
+                <div class="message quote">{{giftersMessage}}</div>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      {{/each}}
+
+    </div>    
+  </div>
+
+</div>
+
+<div class="sectionBody">
+
+  {{! show contribution if it's greater than zero}}
+  {{#if data.myContribution}}
+    My contribution: ${{data.myContribution}}
+  {{/if}}
+  
+  <div>
+    Delivery date: <span class="deliveryDate">{{prettyDate data.giftDeliveryTime}}</span>
+  </div>
+</div>

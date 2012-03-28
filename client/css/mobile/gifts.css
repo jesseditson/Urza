@@ -1,0 +1,397 @@
+/* campaigns on the homepage */
+.campaign:not(:last-child) {
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+}
+.campaign .image { 
+  float: left;
+  width: 80px;
+  height: 80px;
+  text-align: center;
+  background: #eee;
+  box-shadow: 2px 2px 6px 2px rgba(100,100,100,.7);
+  margin-right: 15px;
+  text-align: center;
+  position: relative;
+}
+.gift .info {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	padding: 3%;
+	width: 96%;
+	text-align: center;
+	background: rgba(0, 0, 0, .7);
+	color: #fff;
+	font-size: 65%;
+	line-height: 120%;
+	letter-spacing: .1em;
+}
+.info {
+    font-size: .8em;
+    line-height: 1.2em;
+    padding-top: 3px;
+}
+.campaign .info {
+  font-size: .7em;
+}
+.campaign img
+{  
+  max-width: 100%;
+  max-height: 100%;
+}
+.campaign .details {
+    float: left; width: 65%; 
+}
+.campaign .name{
+  font-weight: bold;
+}
+.campaign .limited {
+  font-style: italic;
+  font-size: .8em;
+}
+
+/* specific campaign on choose a friend page */
+#chooseFriend .campaign {
+  border-bottom: none;
+  padding-bottom:0;
+}
+
+/* gifts on choose a gift page */
+.gift {
+  float: left;
+  position: relative;
+  margin: 0 20px 20px 0;
+  width: 130px;
+  height: 130px;
+  text-align: center;
+  background: #eee;
+  box-shadow: 2px 2px 6px 2px rgba(100,100,100,.7);
+}
+.gift.started {
+  background: #ccc;
+}
+.contributorBadge {
+  position: absolute;
+  right: -7px;
+  top: -7px;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  background: #33a;
+  padding: 2px;
+  border-radius: 20px;
+  line-height: 20px;
+  border: 1px solid #00a;
+  text-align: center;
+}
+#allFriends .contributorBadge,
+#chooseFriendForCampaign .contributorBadge {
+  top: 8px;
+  right: 8px;
+}
+.gift img {  
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#giftDetails .gift {
+  margin-right: 0;
+}
+/* gift details page */
+.campaignGiftDetails {
+  font-size: .8em;
+  line-height: 1.6em;
+  background: #ddd;
+  margin: 0 20px 20px 0;
+  text-align: center;
+}
+.plus {
+  float: left;
+  margin: 40px 10px 0 3px;
+  font-weight: bold;
+}
+#giftDetails .gift {
+  width: 120px;
+  height: 120px;
+  margin-right: 10px;
+}
+#giftDetails .giftTagline {
+  text-align: center;
+  padding: 0 20px 0 0;
+  font-size: .8em;
+  line-height: 1em;
+  font-style: italic;
+}
+
+/* customize gift details */
+#customizeGift .subHeader {
+  font-weight: bold;
+  padding-left: 20px;
+  background: #eee;
+  line-height: 2em;
+  clear:both;
+}
+#customizeGift .subSection {
+  margin: 10px 0 10px 20px;
+}
+
+#customizeGift .sliderRow .text {
+  width: 55%;
+}
+
+#customizeGift .valueRow {
+  margin-bottom: 10px;
+}
+#customizeGift .valueRow .value {
+  float: right;
+  text-align: right;
+  padding-right: 12px;
+  color: #444;
+}
+#customizeGift .incrementText {
+  float: left;
+  line-height: 16px;
+  padding-top: 8px;
+  margin-right: 15px;
+}
+#customizeGift .incrementTools {
+  float: left;
+}
+#customizeGift .valueRow .incrementValue {
+  padding-top: 13px;
+  color: #000;
+}
+#customizeGift .valueRow .text {
+  float: left;
+}
+
+#customizeGift .incrementTools .button {
+  width: 50px;
+  height: 47px;
+  float: left;
+}
+#customizeGift #addValue a,
+#customizeGift #removeValue a
+{
+  font-size: 3em;
+  padding: 6px 0 0;
+  height: auto;
+}
+#customizeGift #removeValue {
+  margin-right: 20px;
+}
+#customizeGift #addValue a {
+  padding-top: 11px;
+}
+
+#customizeGift .giftCardAddedValue,
+#customizeGift #freeValue,
+#customizeGift #totalValue
+{
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+#customizeGift #increments {
+  font-size: .7em;
+}
+#customizeGift .giftCardAddedValue {
+  font-size: 1.7em;
+}
+#customizeGift textarea {
+  width: 92%;
+  font-size: .8em;
+  line-height: 1.1em;
+  height: 3em;
+}
+#customizeGift .contributorBadge {
+  position: static;
+  display: inline-block;
+}
+#customizeGift .otherContributors {
+  font-size: .8em;
+  padding-right: 10px;
+  float: right;
+}
+#contributorsOverlay {
+  background: rgba(0,0,0,.8);
+  border: 1px solid #AAA;
+  box-shadow: 0 0 4px 4px rgba(100,100,100,.8);
+  box-sizing: border-box;
+  padding: 10px;
+  position: absolute;
+  border-radius: 10px;
+  margin: 10px;
+  color: #fff;
+  width: 93%;
+}
+#contributorsOverlay img {
+  border-radius: 10px;
+  box-shadow: 0 0 1px 1px #aaa;
+  margin-right: 10px;
+  vertical-align: middle;
+  max-height: 35px;
+  max-width: 35px;
+}
+#contributorsOverlay .contributor:not(:last-child) {
+  margin-bottom: 7px;
+  padding-bottom: 7px;
+  border-bottom: 1px dashed #aaa;
+}
+
+/* Gift sent confirmation page */
+.giftCard,
+#userGivenGifts .givenGift
+{
+  padding: 10px 0 5px 10px;
+  background: #CCC;
+  border-radius: 10px;
+  margin: 10px;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.3);
+}
+.giftCard .to,
+.giftCard .from .label,
+.givenGift .to .label,
+.givenGift .from .label
+{
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.myContribution {
+  margin-bottom: 7px;
+  font-size: .8em;
+  font-weight: bold;
+}
+.giftCard .from .label,
+.givenGift .to .label,
+.givenGift .from .label
+{
+  margin-right: 10px;
+  float: left;
+}
+.giftCard .from,
+.givenGift .from
+{
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #aaa;
+}
+.giftCard .from .whom,
+.givenGift .from .whom
+{
+  float: left;
+}
+.giftCard .from .whom,
+.givenGift .from .whom
+{
+  width: 80%;
+  padding: 5px 0;
+}
+.giftCard .from .name,
+.givenGift .from .name
+{
+  margin-bottom: 5px;
+}
+.giftCard .from .info,
+.givenGift .from .info
+{
+  float: left;
+  width: 74%;
+}
+.giftCard .from .whom img,
+.givenGift .from .whom img,
+.givenGift .to img
+{
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.5);
+  float: left;
+  margin-right: 10px;
+}
+.giftCard .message,
+.givenGift .message
+{
+  box-shadow: 0 0 2px 2px rgba(0,0,0,.5);
+  padding: 4px;
+  border-radius: 10px;
+  background: #fff;
+  text-align: left;
+  margin: 0;
+  display: inline-block;
+}
+.giftCard .to .whom {
+  font-size: 17px;
+  font-weight: bold;
+}
+.giftCard .info img,
+.givenGift .info img 
+{
+  max-height: 100px;
+  max-width: 100px;
+  float: left;
+  padding-right: 15px;
+}
+.giftCard .details,
+.givenGift .details
+{
+  float: left;
+  width: 55%;
+}
+.giftCard .title,
+.givenGift .title
+{
+  font-size: 18px;
+  padding-bottom: 10px;
+}
+.givenGift .description,
+.giftCard .description
+{
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 22px;
+}
+
+/* my gifts given page */
+#userGivenGifts .givenGift {
+  background: #ddd;
+  margin-top: 40px;
+}
+#userGivenGifts .givenGift .givenDate {
+  position: absolute;
+  top: -25px;
+  right: 10px;
+  border-radius: 5px 5px 0 0;
+  background: #ddd;
+  padding: 3px 10px 0;
+  font-size: 12px;
+  line-height: 21px;
+  border: 1px solid #aaa;
+  border-bottom: 0;
+}
+.givenGift .to {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #aaa;
+}
+.givenGift .to .label {
+  padding-left: 20px;
+}
+
+.userGifts .gifter:not(:last-child),
+.giftCard .gifter:not(:last-child),
+.givenGift .gifter:not(:last-child)
+{
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #aaa;
+}
+
+.giftCard .button.redeem {
+  width: 100%;
+  margin-top: 10px;
+}
+.giftCard .button.redeem a {
+  padding: 11px 0;
+}

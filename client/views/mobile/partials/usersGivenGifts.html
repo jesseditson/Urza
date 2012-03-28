@@ -1,0 +1,79 @@
+<div id="userGivenGifts">
+
+  {{#if data.hasGifts }}
+
+    {{#each data.givenGifts}}
+      <div class="givenGift clearfix">
+        <div class="givenDate">Gifted on {{prettyDate giftDeliveryTime}}</div>
+
+        <div class="to clearfix">
+          <div class="label">To:</div>
+          <div class="whom">
+            <img src="{{receiver.picture}}" alt="{{receiver.name}}" />
+            <div class="name">{{receiver.name}}</div>
+          </div>
+        </div>
+
+
+        <div class="info clearfix">
+          <img src="{{gift.giftImageUrl}}"/>
+          <div class="details">
+            <div class="title">
+              {{#if campaign}}
+                {{campaign.campaignHeadline}} - {{campaign.campaignSubHeadline}}
+              {{else}}
+                {{gift.client}} - {{gift.clientTagLine}}
+              {{/if}}
+            </div>
+            <div class="description">{{decorateDescription gift totalValue}}</div>
+          </div>
+        </div>
+
+        <div class="from clearfix">
+          <div class="label">From:</div>
+          <div class="whom">
+            <div class="gifter clearfix">
+              <img src="{{mine.user.picture}}" alt="{{mine.user.name}}" />
+              <div class="info">
+                <div class="name">{{mine.user.name}}</div>
+                {{#if mine.valueAdded}}
+                  <div class="myContribution">(my contribution: ${{mine.valueAdded}})</div>
+                {{/if}}
+                {{#if mine.giftersMessage}}
+                  <div class="message quote">{{mine.giftersMessage}}</div>
+                {{/if}}
+              </div>
+            </div>
+
+            {{#each gifters}}
+            <div class="gifter clearfix">
+              <img src="{{user.picture}}" alt="{{user.name}}" />
+              <div class="info">
+                <div class="name">{{user.name}}</div>
+                {{#if giftersMessage}}
+                  <div class="message quote">{{giftersMessage}}</div>
+                {{/if}}
+              </div>
+            </div>
+            {{/each}}
+            
+          </div>      
+        </div>
+
+
+        <!-- END gift details -->
+
+      </div>
+    {{/each}}
+
+  {{! EMPTY state with no given gifts }}
+  {{ else }}
+
+    <div class="center" style="margin:20px 20px 0 0;">
+      <div>What, no love? <big style="font-size:1.5em;color:#a00;">&#10084;</big></div>
+      <p><em>Be more gifted!</em></p>
+      <p>Maybe if you <a href="/">give some gifts with Grazi!</a> you'll get more too!</p>
+    </div>
+
+  {{/if}}
+</div>
