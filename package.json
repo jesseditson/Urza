@@ -1,0 +1,38 @@
+{
+  "author": "Jesse Ditson <jesse.ditson@gmail.com>",
+  "name": "Urza",
+  "description": "Urza is a node.js framework built for rapid development.",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jesseditson/Urza.git"
+  },
+  "main": "urza.js",
+  "scripts": {
+    "test": "vows --spec"
+  },
+  "engines": {
+    "node": "~0.6.11 || 0.6.11-pre"
+  },
+  "dependencies": {
+    "underscore" : "1.3.x",
+    "express" : "2.5.x",
+    "config" : "0.4.x",
+    "winston" : "0.5.x",
+    "winston-sns" : "0.0.x",
+    "everyauth" : "0.2.x",
+    "mongoose" : "2.5.x",
+    "connect-mongo" : "0.1.x",
+    "handlebars" : "1.0.x",
+    "gzippo" : "0.1.x",
+    "async" : "0.1.x",
+    "requirejs" : "1.0.x",
+    "request" : "2.9.x",
+    "useragent" : "1.0.x"
+  },
+  "devDependencies": {
+    "vows" : "0.6.x",
+    "docco" : "0.3.x"
+  },
+  "optionalDependencies": {}
+}
