@@ -1,0 +1,41 @@
+<!doctype html>
+<!--[if lt IE 9]><html class="ie"><![endif]-->
+<!--[if gte IE 9]><!--><html><!--<![endif]-->
+	<head>
+		<meta charset="utf-8"/>
+		<title></title>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link rel="stylesheet" media="all" href="/css/main.css"/>
+
+        <!-- mobile style sheets -->
+		<link rel="stylesheet" media="all" href="/css/mobile/base.css"/>
+		<link rel="stylesheet" media="all" href="/css/mobile/gifts.css"/>
+		<link rel="stylesheet" media="all" href="/css/mobile/friends.css"/>
+    
+    <!-- component css -->
+    {{#each componentcss}}
+    <link rel="stylesheet" media="all" href="/css/components/{{this}}"/>
+    {{/each}}
+
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <script src="/js/external/underscore.js"></script>
+    <script src="/js/require-config.js"></script>
+    <script data-main="/js/app" src="/js/external/require-jquery.js"></script>
+	</head>
+	<body lang="en">
+    <header>
+      <a class="homeLink" href="/">Grazi</a>
+      <a href="/myAccount" class="settingsLink">settings</a>
+      <a href="/myGifts" class="headerLink">my gifts</a>
+      <a href="/" class="headerLink">give a gift</a>
+    </header>
+    <div id="bodyScroll">
+      <article class="sections" id="content">
+        {{{body}}}
+      </article>
+    </div>
+	</body>
+</html>

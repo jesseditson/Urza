@@ -1,0 +1,15 @@
+{
+    "author": "Jesse<hi@h.com>",
+    "name": "NO NAME",
+    "description": "This app was created with Urza - http://github.com/jesseditson/Urza",
+    "version": "0.0.1",
+    "main": "server.js",
+    "repository": {},
+    "engines": {
+        "node": "~0.6.11 || 0.6.11-pre"
+    },
+    "dependencies": {},
+    "devDependencies": {},
+    "optionalDependencies": {},
+    "desc": ""
+}
