@@ -8,7 +8,10 @@
   "engines": {
     "node": "~0.6.11 || 0.6.11-pre"
   },
-  "dependencies": {},
+  "dependencies": {
+    "urza" : "0.0.x",
+    "config" : "0.4.x"
+  },
   "devDependencies": {},
   "optionalDependencies": {}
 }

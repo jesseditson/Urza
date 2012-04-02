@@ -1,6 +1,6 @@
 {
   "author": "Jesse Ditson <jesse.ditson@gmail.com>",
-  "name": "Urza",
+  "name": "urza",
   "description": "Urza is a node.js framework built for rapid development.",
   "version": "0.0.1",
   "repository": {
@@ -23,9 +23,7 @@
     "config" : "0.4.x",
     "winston" : "0.5.x",
     "winston-sns" : "0.0.x",
-    "everyauth" : "0.2.x",
     "mongoose" : "2.5.x",
-    "connect-mongo" : "0.1.x",
     "handlebars" : "1.0.x",
     "gzippo" : "0.1.x",
     "async" : "0.1.x",
