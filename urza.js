@@ -36,7 +36,7 @@ if(require.main === module) {
   // creates an Urza app.
 
   program
-    .command('create [appname]')
+    .command('init [appname]')
     .description('create a new Urza app')
     .action(function(appdir){
       appdir = appdir || "mySuperGreatApp";
