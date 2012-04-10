@@ -9,7 +9,7 @@
     "node": "~0.6.11 || 0.6.11-pre"
   },
   "dependencies": {
-    "urza" : "0.0.x",
+    "urza" : "git://github.com/jesseditson/Urza.git#master",
     "config" : "0.4.x"
   },
   "devDependencies": {},

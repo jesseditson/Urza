@@ -11,7 +11,9 @@ if(require.main === module) {
   // Dependencies
   // ------------
   var fs = require('fs'),
+      path = require('path'),
       wrench = require('wrench'),
+      walk = require('./lib/helpers/walk'),
       mkdirp = require('mkdirp'),
       async = require('async'),
       exec = require('child_process').exec,
@@ -24,6 +26,24 @@ if(require.main === module) {
 
   // Command-Line App
   // ----------------
+  
+  // CLI Global Helpers
+  var appRoot,
+      getAppRoot = function(dir){
+        if(appRoot) return appRoot;
+        // looks up the directory tree until it finds a folder with a .urza file.
+        var dir = dir ? dir.replace(/\/[^\/]+$/,'') : process.cwd();
+        if(!dir.length){
+          console.error('Urza app not found. Please run from inside an Urza app.');
+          process.exit(1);
+          return false;
+        } else if(!path.existsSync(dir + '/.urza')){
+          return getAppRoot(dir);
+        } else {
+          appRoot = dir;
+          return dir;
+        }
+      }
 
   // Set up our program:
   program
@@ -32,21 +52,24 @@ if(require.main === module) {
   // Urza's Tasks
   // ------------
 
-  // **Create**
+  // **Init**
   // creates an Urza app.
 
   program
-    .command('init [appname]')
+    .command('init [appdir]')
     .description('create a new Urza app')
     .action(function(appdir){
-      appdir = appdir || "mySuperGreatApp";
+      if(!appdir){
+        console.error('Error: You must tell me where to put your app! Try init <appname>');
+        process.exit(1);
+      }
       var options = JSON.parse(fs.readFileSync(__dirname + '/example/package.json'));
       console.log('creating app %s...',appdir);
       // set up our app basics:
       var prompts = [
           ['prompt','What is your name?: ',function(author){ options.author = author; }],
           ['prompt','What is your email address?: ',function(email){ options.author += "<"+email+">"; }],
-          ['prompt','Give your creation a name (no spaces allowed.): ',function(name){ options.name = name; }],
+          ['prompt','Give your creation a name: ',function(name){ options.name = name.replace(' ','-'); }],
           ['prompt','Describe your creation: ',function(desc){ options.desc = desc; }]
         ],
         // loops through commands until they are finished.
@@ -81,22 +104,119 @@ if(require.main === module) {
               wrench.copyDirSyncRecursive(__dirname + '/example',appdir);
               console.log('created directory tree.');
               // we have created the app folder. now create the package.json file and replace appName in the files.
-              // TODO: walk the file tree and replace [[APPNAME]] with the app name.
-              // rename the database to match this app.
-              if(!options.db) options.db = {};
-              options.db.name = appdir + "_db";
-              // TODO: autodetect git repo.
-              fs.writeFile(appdir + '/package.json',JSON.stringify(options,null,4));
-              console.log('installing dependencies...');
-              exec('cd '+appdir+' && npm install',function(){
-                process.exit(0);
+              console.log('adding names to app files.');
+              walk(appdir,function(file,folder){
+                var fPath = folder + '/'+ file,
+                    content = fs.readFileSync(fPath,'utf8').replace(/\[\[APPNAME\]\]/g,options.name);
+                fs.writeFileSync(fPath,content);
+              },function(){
+                // rename the database to match this app.
+                if(!options.db) options.db = {};
+                options.db.name = appdir + "_db";
+                // TODO: autodetect git repo.
+                fs.writeFile(appdir + '/package.json',JSON.stringify(options,null,4));
+                console.log('installing dependencies...');
+                exec('cd '+appdir+' && npm install',function(){
+                  process.exit(0);
+                });
               });
             }
           });
         }
       });
     });
-
+  
+  // **Create Commands**
+  // these create Urza app items.
+  
+  // Helpers
+  var updateViews = function(viewRoutes,raw){
+        var root = getAppRoot(),
+            appFile = root + '/client/js/external/app.js',
+            viewFolder = root + '/client/js/lib/views/',
+            htmlFolders = [root + '/client/views/mobile/',root + '/client/views/web/'],
+            requireViewPath = 'lib/views/';
+        if(path.existsSync(appFile)){
+          var clientContents = fs.readFileSync(appFile,'utf8'),
+              viewFiles = fs.readdirSync(viewFolder),
+              viewObjectPattern = /viewObject\s*=\s*(\{[^\{\}]*\})/,
+              viewObjectMatches = clientContents.match(viewObjectPattern);
+          if(!viewObjectMatches || !viewObjectMatches[1]){
+            console.error('Error updating views. app.js does not appear to define a viewObject.');
+            process.exit(1);
+          }
+          var viewObject = JSON.parse(viewObjectMatches[1]),
+              viewTemplate = fs.readFileSync(__dirname + '/templates/view.js','utf8');
+          // loop through the views in viewRoutes
+          for(var viewName in viewRoutes){
+            if(!~viewFiles.indexOf(viewName + '.js')){
+              // we don't have this view yet, add it.
+              viewObject[viewName] = viewName;
+              if(viewRoutes[viewName]){
+                // we have a route for this view.
+                viewObject[requireViewPath+viewName] += viewRoutes[viewName].replace(/^\//,'');
+              }
+              // create the view.
+              console.log('adding %s file',viewName+'.js');
+              fs.writeFileSync(viewFolder + viewName + '.js', viewTemplate.replace(/\[\[NAME\]\]/g,viewName),'utf8');
+              if(!raw){
+                try {
+                  // create the corresponding html files.
+                  htmlFolders.forEach(function(folder){
+                    // TODO: should the extension be read from the app settings?
+                    console.log('adding %s file to %s',viewName+'.html',folder);
+                    fs.writeFileSync(folder + viewName + '.html','','utf8');
+                  });
+                } catch(e) {
+                  console.error('Error creating view files. '+e.message);
+                  // TODO: cleanup after error
+                  process.exit(1);
+                }
+              }
+            } else {
+              // this view already exists.
+              console.error('This view already exists - if you really want to remove it, please remove it first.');
+              process.exit(1);
+            }
+          }
+          var newClient = clientContents.replace(viewObjectPattern,'viewObject = ' + JSON.stringify(viewObject));
+          console.log('updating view object in app.js');
+          fs.writeFileSync(appFile,newClient,'utf8');
+        } else {
+          console.error('Error updating views. Did you delete the app.js file?');
+          process.exit(1);
+        }
+      },
+      createView = function(name,route,raw){
+        var root = getAppRoot(),
+            routes = {};
+        routes[name] = route;
+        updateViews(routes,raw);
+      },
+      createPartial = function(name){
+        
+      }
+  // Command
+  program
+    .command('create type [name]')
+    .description('creates a new view or partial in the current Urza app.\n use `create view` or `create partial`.')
+    .option('-r, --route <route>','specify a route for this to match. (view only)')
+    .option('-j, --raw','don\'t create html views for this item. (view only)')
+    .action(function(type,info){
+      var rawArgs = info.parent.rawArgs,
+          name = rawArgs[rawArgs.length-1];
+      if(type=='view'){
+        // create view command
+        var route = info.route,
+            raw = info.raw;
+          createView(name,route,raw,function(){
+              
+          });
+      } else if(type=='partial'){
+        // create partial command
+        
+      }
+    });
   // Start it up
   program.parse(process.argv);
 } else {
@@ -180,11 +300,9 @@ if(require.main === module) {
       this.configureTemplates(app);
       // middleware
     	app.use(express.methodOverride());
-    	if(this.options.environment == 'production'){
-        app.use(gzippo.staticGzip('./client'));
-      } else {
-        app.use(express.static('./client'));
-      }
+      app.use(express.static('./client'));
+      app.use(express.static(__dirname + '/client'));
+      app.use(gzippo.compress());
       // if authenticate is specified, use the path specified as the authenticate middleware.
       if(this.options.authenticate){
         app.use(require(authenticate));
@@ -214,7 +332,7 @@ if(require.main === module) {
   UrzaServer.prototype.configureHelpers = function(app){
     // set up dynamic helpers - these will be available in the layout scope when pages are rendered.
     var cssCache,
-        componentPath = __dirname + '/client/css/components';
+        componentPath = process.cwd() + '/client/css/components';
     app.dynamicHelpers({
       user : function(req,res){
         return req.session && req.session.user;
@@ -234,7 +352,7 @@ if(require.main === module) {
       case 'handlebars' :
         // set up view engine
         app.set('view engine','html');
-      	app.set('views',__dirname+ '/client/views');
+      	app.set('views',process.cwd()+ '/client/views');
       	app.register('html',expressHandlebars);
         break;
       default :
