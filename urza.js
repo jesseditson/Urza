@@ -43,6 +43,22 @@ if(require.main === module) {
           appRoot = dir;
           return dir;
         }
+      },
+      parseJSON = function(string){
+        var res = false;
+        try {
+          res=JSON.parse(string);
+        } catch(e){
+          //console.warn('failed first try to parse JSON: %s',e.message);
+          try {
+            string = string.replace(/'/g,'"');
+            res=JSON.parse(string);
+          } catch(e){
+            console.error('FAILED PARSING: %s',string);
+            throw e;
+          }
+        }
+        return res;
       }
 
   // Set up our program:
@@ -130,28 +146,31 @@ if(require.main === module) {
   // these create Urza app items.
   
   // Helpers
-  var updateViews = function(viewRoutes,raw){
+  var appViewFolder = '/client/js/lib/views/',
+      appHtmlFolders = ['/client/views/mobile/','/client/views/web/'],
+      appViewFile = '/client/js/lib/views.js',
+      requireViewPath = 'lib/views/';
+      updateViews = function(viewRoutes,raw){
         var root = getAppRoot(),
-            appFile = root + '/client/js/external/app.js',
-            viewFolder = root + '/client/js/lib/views/',
-            htmlFolders = [root + '/client/views/mobile/',root + '/client/views/web/'],
-            requireViewPath = 'lib/views/';
+            appFile = root + appViewFile,
+            viewFolder = root + appViewFolder,
+            htmlFolders = appHtmlFolders.map(function(folder){ return root + folder; });
         if(path.existsSync(appFile)){
           var clientContents = fs.readFileSync(appFile,'utf8'),
               viewFiles = fs.readdirSync(viewFolder),
               viewObjectPattern = /viewObject\s*=\s*(\{[^\{\}]*\})/,
               viewObjectMatches = clientContents.match(viewObjectPattern);
-          if(!viewObjectMatches || !viewObjectMatches[1]){
-            console.error('Error updating views. app.js does not appear to define a viewObject.');
+          if(!viewObjectMatches || !viewObjectMatches[1] || !parseJSON(viewObjectMatches[1])){
+            console.error('Error updating views. app.js does not appear to define a valid viewObject.');
             process.exit(1);
           }
-          var viewObject = JSON.parse(viewObjectMatches[1]),
+          var viewObject = parseJSON(viewObjectMatches[1]),
               viewTemplate = fs.readFileSync(__dirname + '/templates/view.js','utf8');
           // loop through the views in viewRoutes
           for(var viewName in viewRoutes){
             if(!~viewFiles.indexOf(viewName + '.js')){
               // we don't have this view yet, add it.
-              viewObject[viewName] = viewName;
+              viewObject[requireViewPath + viewName] = viewName;
               if(viewRoutes[viewName]){
                 // we have a route for this view.
                 viewObject[requireViewPath+viewName] += viewRoutes[viewName].replace(/^\//,'');
@@ -175,15 +194,15 @@ if(require.main === module) {
               }
             } else {
               // this view already exists.
-              console.error('This view already exists - if you really want to remove it, please remove it first.');
+              console.error('This view already exists - if you really want to replace it, please remove it first.');
               process.exit(1);
             }
           }
           var newClient = clientContents.replace(viewObjectPattern,'viewObject = ' + JSON.stringify(viewObject));
-          console.log('updating view object in app.js');
+          console.log('updating view object in views.js');
           fs.writeFileSync(appFile,newClient,'utf8');
         } else {
-          console.error('Error updating views. Did you delete the app.js file?');
+          console.error('Error updating views. Did you delete the views.js file?');
           process.exit(1);
         }
       },
@@ -195,11 +214,48 @@ if(require.main === module) {
       },
       createPartial = function(name){
         
-      }
+      },
+      removeView = function(name){
+        var root = getAppRoot(),
+            appFile = root + appViewFile,
+            viewFolder = root + appViewFolder,
+            htmlFiles = appHtmlFolders.map(function(folder){ return root + folder + name + '.html'; }),
+            removeFiles = [viewFolder + name + '.js'].concat(htmlFiles);
+        if(path.existsSync(appFile)){
+          var clientContents = fs.readFileSync(appFile,'utf8'),
+              viewFiles = fs.readdirSync(viewFolder),
+              viewObjectPattern = /viewObject\s*=\s*(\{[^\{\}]*\})/,
+              viewObjectMatches = clientContents.match(viewObjectPattern);
+          if(!viewObjectMatches || !viewObjectMatches[1] || !parseJSON(viewObjectMatches[1])){
+            console.error('Error updating views. app.js does not appear to define a valid viewObject.');
+            process.exit(1);
+          }
+          var viewObject = parseJSON(viewObjectMatches[1]);
+          delete viewObject[requireViewPath + name];
+          var newClient = clientContents.replace(viewObjectPattern,'viewObject = ' + JSON.stringify(viewObject,2));
+          console.log('updating view object in views.js');
+          fs.writeFileSync(appFile,newClient,'utf8');
+          console.log('removing view files');
+          removeFiles.forEach(function(file){
+            if(path.existsSync(file)){
+              fs.unlinkSync(file);
+            } else {
+              console.warn('didn\'t find view file %s - assuming it was deleted and continuing.',file);
+            }
+          });
+          process.exit(0);
+        } else {
+          console.error('Error updating views. Did you delete the views.js file?');
+          process.exit(1);
+        }
+      },
+      removePartial = function(){
+        
+      };
   // Command
   program
     .command('create type [name]')
-    .description('creates a new view or partial in the current Urza app.\n use `create view` or `create partial`.')
+    .description('creates a new view or partial in the current Urza app.\n use `create view <name>` or `create partial <name>`.')
     .option('-r, --route <route>','specify a route for this to match. (view only)')
     .option('-j, --raw','don\'t create html views for this item. (view only)')
     .action(function(type,info){
@@ -214,6 +270,22 @@ if(require.main === module) {
           });
       } else if(type=='partial'){
         // create partial command
+        
+      }
+    });
+  // **Remove Items**
+  program
+    .command('remove type [name]')
+    .description('removes a view or partial in the current Urza app.\n use `remove view <name>` or `remove partial <name`.')
+    .action(function(type,info){
+      // TODO: move duplicated logic up to a helper, check for uncommited changes before removing.
+      var rawArgs = info.parent.rawArgs,
+          name = rawArgs[rawArgs.length-1];
+      if(type=='view'){
+        // remove view command
+        removeView(name);
+      } else if(type=='partial'){
+        //remove partial command
         
       }
     });

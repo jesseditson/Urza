@@ -100,7 +100,6 @@ define(['jquery','external/require-backbone'],function($,Backbone){
         // Set up or create the element. if it exists, move it inside the container.
         var el = '<div id="'+this.name+'">',
           container = $(this.container);
-          console.log(container);
         if($('#'+this.name)) $('#'+this.name).remove();
         container.html(el);
         this.obj.el = container.find("#"+this.name)[0];

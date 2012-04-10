@@ -11,7 +11,8 @@ define(
     for(var viewPath in viewObject){
       var viewName,
           viewNameMatches = viewPath.match(/\/([^\/]+)(\.js)?$/);
-      if(!viewNameMatches[1]){
+          console.log(viewPath);
+      if(!viewNameMatches || !viewNameMatches[1]){
         throw new Error('view name for view '+viewPath+' is malformed. Failed to load views.');
         return;
       }
