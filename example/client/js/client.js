@@ -29,5 +29,5 @@ require([
     }
   }
   // This line will fire off the first navigation and start the app.
-  app.router.start();
+  app.start();
 });

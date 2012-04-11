@@ -174,7 +174,7 @@ if(require.main === module) {
               viewObject[requireViewPath + viewName] = viewName;
               if(viewRoutes[viewName]){
                 // we have a route for this view.
-                viewObject[requireViewPath+viewName] += viewRoutes[viewName].replace(/^\//,'');
+                viewObject[requireViewPath+viewName] += "/" + viewRoutes[viewName].replace(/^\//,'');
               }
               // create the view.
               console.log('adding %s file',viewName+'.js');

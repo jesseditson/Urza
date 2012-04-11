@@ -35,6 +35,7 @@ define(
     }
     return {
       views : views,
-      router : app
+      router : app,
+      start : app.start
     };
   });

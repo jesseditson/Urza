@@ -117,7 +117,7 @@ There are a few things not that the above example should make clear, but are wor
 
 All views in Urza are parsed on the server, and rendered on the client. This allows the use of DOM manipulation in views, but also maintains the speed of rendering on the server, and has long-term SEO implications (that have yet to be implemented).
 
-Each View usually has 2 files: a template file, and a js file. A js file is mandatory, but templates can be shared betweeen views, or js files could even just manipulate the DOM - however, this breaks SEO, so definitely isn't recommended.
+Each View usually has 2 files: a template file, and a js file. A js file is mandatory, but templates can be shared betweeen views, or js files could even just manipulate the DOM - however, this will break SEO, so definitely isn't recommended.
 
 All views are rendered via push state, so every Urza app is a single page app as far as the browser is concerned, although your apps may behave more like a multiple-page app.
 
@@ -133,13 +133,13 @@ This will generate a js file and an html file with the view name, along with add
 
 To create a more complicated route, you can create a view with name and a route:
 
-    urza create view --route "/someparam/:paramname/*splat" <viewname>
+    urza create view --route "/:someparam/:paramname/*splat" <viewname>
 
 This will expose the route: `http://yourapp.com/viewname/someparam/anotherparam/stuff/stuff/stuff`. These currently conform to backbone routes (but will probably use [director](https://github.com/flatiron/director) routes in the future).
 
 To omit the html file and just set up the route, add the `--raw` flag (maybe needs to be renamed?)
 
-    urza create view --route "/myRoute/:option" --raw <viewname>
+    urza create view --route ":option/:anotheroption --raw <viewname>
 
 This will skip creating the blank html file.
 
@@ -161,16 +161,54 @@ Creating partials is as simple as just adding the file to the `partials` folder 
 
 	urza create partial <partialname>
 
-This will create a partial in both the `web` and `mobile` platform folders. To skip adding a partial to one of the platforms, add the `--platform` flag:
-
-	urza create partial --platform <web|mobile> <partialname>
+This will create a partial in both the `web` and `mobile` platform folders.
 
 #####Data in views and partials:
 
 In both views and partials, the object passed to the template will have a `data` key that contains the data passed. The main difference between views and partials is that a view is passed data by the router, whereas a partial is tied to an api endpoint (although you can pass it data using the `data-obj` attribute as well).
 
-#####Routing:
+####Client-Side Routing:
 
 all routing is handled by the `client.js` file, located at: `client/js/client.js`.
 
-TODO
+Routes are triggered via push state, and will (by default) call the route method when routed to.
+
+Each view will automatically answer to a route by calling it's own `show()` method. For instance, if we run `urza create view foo`, we can now navigate to `http://appurl/foo`, and the `foo.html` file will replace the content of the `#content` div. You don't have to add a route for this, but if you'd like to inject data or do other fancy stuff (conditional navigation, etc), you can add a route for your view.
+
+`client.js` contains some boilerplate code that you can remove, and replace with your own routes. Views are available on the app.views object - using the above example again, you can add a route for `foo` by setting `app.views.foo.router` to a function - for instance:
+
+	app.views.foo.route = function(){
+	  this.show({key:'value'});
+	}
+
+when in the function, `this` is the view, so you can call any of the view methods from there.
+
+After you have overridden any routes you'd like to use, you'll want to start the app to trigger the current route and listen for more routes.
+
+make sure that the last line in `client.js` is:
+
+	app.start();
+
+####View Hooks & Methods:
+
+All views expose various methods for interacting or responding to them - here's an overview:
+
+- `view.render(<function>)`:
+	- Pass this method a function to trigger when a view has started to draw. All elements in the view template will be available on the DOM, but partials are not available yet.
+- `view.postRender(<function>)`:
+	- The passed function is triggered after the view has completely finished rendering - you can access partials and stuff here.
+- `view.get(<keyname>) and view.set(<keyname>,<value>)`
+	- arbitrary key/value store on the view. Good for passing data around on views. Note that the main use for this is to access the `data` key passed when data is set on a view. For instance - if you call `view.show({foo:'bar'})`, you can then access the foo key using `view.get('data').foo`
+- `view.on(<eventString>,<function>)`
+	- this is basically a wrapper for backbone's `on` method - this will allow you to bind events to the view. Not sure if this is staying in long-term.
+- `view.transitionIn and view.transitionOut`
+	- these methods can be overriden to add transitions to views. They must be overriden with a single argument of `callback`, which must be called in order for the view to continue rendering.
+- `view.showLoading and view.hideLoading`
+	- these methods can be overriden to add a loading screen between pages.
+- `view.remove()`
+	- this will entirely remove the view and it's events from the DOM.
+- `view.renderPartial(<partialname>,<callback>)`
+	- this will re-render a partial (called by name), and optionally call back when the render is complete. It will request the same api endpoint it was set up with and re-draw the partial.
+- `view.show(<data>)`
+	- this will begin the cycle of drawing the view. You may optionally pass in data for the view to render.
+
