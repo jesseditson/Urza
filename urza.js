@@ -127,8 +127,9 @@ if(require.main === module) {
                 fs.writeFileSync(fPath,content);
               },function(){
                 // rename the database to match this app.
-                if(!options.db) options.db = {};
-                options.db.name = appdir + "_db";
+                // TODO: make this edit the config/default.json file.
+                //if(!options.db) options.db = {};
+                //options.db.name = appdir + "_db";
                 // TODO: autodetect git repo.
                 fs.writeFile(appdir + '/package.json',JSON.stringify(options,null,4));
                 console.log('installing dependencies...');
@@ -360,11 +361,14 @@ if(require.main === module) {
   var UrzaServer = module.exports.Server = function(options){
     this.options = options;
     this.app = this.createApp();
+    if(options.configure){
+      options.configure(this.app);
+    }
     this.addRoutes(this.app);
     // mimic the routing behavior of express.
-    var expressMethods = ['get','post','all'];
+    var expressMethods = ['get','post','all','use','configure'];
     expressMethods.forEach(function(method){
-      this[method] = this.app[method];
+      this[method] = this.app[method].bind(this.app);
     }.bind(this));
   }
 
@@ -411,6 +415,11 @@ if(require.main === module) {
     	app.use(express.bodyParser());
     	app.use(express.cookieParser());
       // TODO: add persistent sessions.
+      if(this.options.sessionHandler){
+        app.use(express.session(this.options.sessionHandler));
+      } else {
+        app.use(express.session({ secret: "aging daddies" }));
+      }
       // templates
       this.configureTemplates(app);
       // middleware
@@ -420,7 +429,7 @@ if(require.main === module) {
       app.use(gzippo.compress());
       // if authenticate is specified, use the path specified as the authenticate middleware.
       if(this.options.authenticate){
-        app.use(require(authenticate));
+        app.use(require(process.cwd() + '/' + this.options.authenticate));
       }
     	app.use(useragent);
     	app.use(render);
@@ -457,6 +466,7 @@ if(require.main === module) {
         return cssCache;
       }
     });
+    return app;
   }
 
   // **Set up Templating Engine**
@@ -469,11 +479,13 @@ if(require.main === module) {
         app.set('view engine','html');
       	app.set('views',process.cwd()+ '/client/views');
       	app.register('html',expressHandlebars);
+        this.templatingEngine = expressHandlebars;
         break;
       default :
         throw new Error('Unknown templating engine specified: "'+this.options.templates.engine+'"');
         break;
     }
+    return app;
   }
 
   // **Set up Routes**
@@ -495,18 +507,27 @@ if(require.main === module) {
     });
     //**Partial Route**
     // renders a partial based on an api call
-    app.all('/partial/:name/*',function(req,res,next){
-      callApi(req.params,req.session,req.body,function(err,response){
-       if(err){
-         res.json(err.message,500);
-       } else {
-         data = {
-           data : response,
-           layout : false
-         };
-         res.render('partials/' + req.params.name,data);
-       }
-      });
+    app.all(/\/partial\/([^\/]+)\/?(.+)?/,function(req,res,next){
+      // Note: this is all hacked together because express does not appear to support optional splats.
+      // http://stackoverflow.com/questions/10020099/express-js-routing-optional-spat-param
+      var params = req.params[1] ? [req.params[1]] : [],
+          name = req.params[0];
+      if(params.length){
+        callApi(params,req.session,req.body,function(err,response){
+         if(err){
+           res.json(err.message,500);
+         } else {
+           data = {
+             data : response,
+             layout : false
+           };
+           logger.info('partial request complete.',req.timer);
+           res.render('partials/' + name,data);
+         }
+        });
+      } else {
+        res.render('partials/'+name,{layout:false});
+      }
     });
     // **View Route**
     // Renders a view
@@ -519,14 +540,19 @@ if(require.main === module) {
     });
     // **Main App Route**
     app.all("/*",function(req,res,next){
-      var params = req.prams && req.params.split('/');
-      res.render('main');
-    });
+      if(this['default']){
+        this.default.call(app,req,res,next);
+      } else {
+        var params = req.prams && req.params.split('/');
+        res.render('main');
+      }
+    }.bind(this));
     // **404 Error Route**
     // this route always should go last, it will catch errors.
     app.all(/(.*)/,function(req,res){
       // TODO: make this prettier.
       res.send(404);
     });
+    return app;
   }
 }
