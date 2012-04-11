@@ -237,9 +237,10 @@ if(require.main === module) {
             console.error('Error updating views. app.js does not appear to define a valid viewObject.');
             process.exit(1);
           }
-          var viewObject = parseJSON(viewObjectMatches[1]);
+          var viewObject = parseJSON(viewObjectMatches[1]),
+              viewArray = parseJSON((viewArrayMatches && viewArrayMatches[1]) || '[]');
           delete viewObject[requireViewPath + name];
-          viewArray.splice(viewArray.indexOf(requireViewPath + viewName),1);
+          viewArray.splice(viewArray.indexOf(requireViewPath + name),1);
           var newClient = clientContents
                             .replace(viewObjectPattern,'viewObject = ' + JSON.stringify(viewObject,2))
                             .replace(viewArrayPattern,'define(' + JSON.stringify(viewArray,2));

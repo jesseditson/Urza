@@ -1,4 +1,4 @@
-define(['Backbone'],function(Backbone){
+define(['external/require-backbone'],function(Backbone){
   // Router Class
   // Basically just a wrapper for the backbone router, which obscures backbone's annoying syntax.
   var Router = function(routes){

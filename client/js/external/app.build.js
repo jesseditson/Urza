@@ -5,11 +5,11 @@
   optimize : "none",
   paths : {
     "jquery" : "../../node_modules/urza/client/js/external/require-jquery",
-    "amplify" : "../../node_modules/urza/client/js/external/amplify",
-    "app" : "../../node_modules/urza/client/js/external/app",
-    "Router" : "../../node_modules/urza/client/js/lib/router",
-    "View" : "../../node_modules/urza/client/js/lib/view",
-    "Backbone" : "../../node_modules/urza/client/js/external/require-backbone"
+    "external/amplify" : "../../node_modules/urza/client/js/external/amplify",
+    "external/app" : "../../node_modules/urza/client/js/external/app",
+    "lib/router" : "../../node_modules/urza/client/js/lib/router",
+    "lib/view" : "../../node_modules/urza/client/js/lib/view",
+    "external/require-backbone" : "../../node_modules/urza/client/js/external/require-backbone"
   },
   modules : [
     {

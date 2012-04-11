@@ -1,4 +1,4 @@
-define(['jquery','Backbone'],function($,Backbone){
+define(['jquery','external/require-backbone'],function($,Backbone){
   // Local Helpers
   // Render - renders partials from the server
   var render = function(partial,api,data,el,callback){
