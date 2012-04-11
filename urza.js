@@ -165,6 +165,7 @@ if(require.main === module) {
             process.exit(1);
           }
           var viewObject = parseJSON(viewObjectMatches[1]),
+              viewHtmlTemplate = fs.readFileSync(__dirname + '/templates/view.html','utf8'),
               viewTemplate = fs.readFileSync(__dirname + '/templates/view.js','utf8');
           // loop through the views in viewRoutes
           for(var viewName in viewRoutes){
@@ -184,7 +185,7 @@ if(require.main === module) {
                   htmlFolders.forEach(function(folder){
                     // TODO: should the extension be read from the app settings?
                     console.log('adding %s file to %s',viewName+'.html',folder);
-                    fs.writeFileSync(folder + viewName + '.html','','utf8');
+                    fs.writeFileSync(folder + viewName + '.html',viewHtmlTemplate.replace(/\[\[NAME\]\]/g,viewName),'utf8');
                   });
                 } catch(e) {
                   console.error('Error creating view files. '+e.message);
@@ -211,9 +212,6 @@ if(require.main === module) {
             routes = {};
         routes[name] = route;
         updateViews(routes,raw);
-      },
-      createPartial = function(name){
-        
       },
       removeView = function(name){
         var root = getAppRoot(),
@@ -249,8 +247,29 @@ if(require.main === module) {
           process.exit(1);
         }
       },
-      removePartial = function(){
-        
+      createPartial = function(name){
+        var root = getAppRoot(),
+            htmlFiles = appHtmlFolders.map(function(folder){ return root + folder + 'partials/' + name + '.html'; }),
+            viewTemplate = fs.readFileSync(__dirname + '/templates/partial.html','utf8');
+        console.log('creating partial');
+        htmlFiles.forEach(function(file){
+          // create the partial.
+          console.log('adding partial %s ',file);
+          fs.writeFileSync(file, viewTemplate.replace(/\[\[NAME\]\]/g,name),'utf8');
+        });
+      },
+      removePartial = function(name){
+        var root = getAppRoot(),
+            htmlFiles = appHtmlFolders.map(function(folder){ return root + folder + 'partials/' + name + '.html'; });
+        htmlFiles.forEach(function(file){
+          console.log('removing partial %s',file);
+          if(path.existsSync(file)){
+            fs.unlinkSync(file);
+          } else {
+            console.warn('didn\'t find partial file %s - assuming it was deleted and continuing.',file);
+          }
+        });
+        process.exit(0);
       };
   // Command
   program
@@ -265,12 +284,16 @@ if(require.main === module) {
         // create view command
         var route = info.route,
             raw = info.raw;
-          createView(name,route,raw,function(){
-              
-          });
+        createView(name,route,raw);
       } else if(type=='partial'){
         // create partial command
-        
+        createPartial(name);
+      } else {
+        if(type){
+          console.log("I don't know how to create %s.",type);
+        } else {
+          console.log('please specify what you would like to create.');
+        }
       }
     });
   // **Remove Items**
@@ -283,10 +306,30 @@ if(require.main === module) {
           name = rawArgs[rawArgs.length-1];
       if(type=='view'){
         // remove view command
-        removeView(name);
+        program.confirm('Are you sure you want to delete the '+name+' view?',function(yes){
+          if(yes){
+            removeView(name);
+          } else {
+            console.log('exiting');
+            process.exit(0);
+          }
+        });
       } else if(type=='partial'){
         //remove partial command
-        
+        program.confirm('Are you sure you want to delete the '+name+' partial?',function(yes){
+          if(yes){
+            removePartial(name);
+          } else {
+            console.log('exiting');
+            process.exit(0);
+          }
+        });
+      } else {
+        if(type){
+          console.log("I don't know how to remove %s.",type);
+        } else {
+          console.log('please specify what you would like to remove.');
+        }
       }
     });
   // Start it up
