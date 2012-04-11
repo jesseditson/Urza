@@ -24,7 +24,11 @@ define(
       if(route.match(/:\w+\?/)){
         var optionPattern = /:(\w+)(\?)?\/?/g, match, regex="/",num=0;
         while(match = optionPattern.exec(route)){
-          if(num) regex += match[2] ? "\\/?" : "\\/";
+          if(num){
+            regex += match[2] ? "\\/?" : "\\/";
+          } else {
+            regex += match[2] ? "?" : "";
+          }
           regex += "([^\\/]+)" +(match[2]?"?":"");
           num++;
         }
