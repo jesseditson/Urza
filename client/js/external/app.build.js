@@ -1,15 +1,18 @@
 ({
-  appDir : "../../",
+  appDir : "../../../../../client",
   baseUrl : "js",
-  dir : "../../../public/",
-  optimize : "false",
+  dir : "../../../../../public",
+  optimize : "uglify",
   paths : {
-    "jquery" : "external/require-jquery"
+    "jquery" : "node_modules/urza/client/js/external/require-jquery.js",
+    "amplify" : "node_modules/urza/client/js/external/amplify.js",
+    "app" : "node_modules/urza/client/js/external/app.js",
+    "View" : "node_modules/urza/client/js/lib/view.js"
   },
   modules : [
     {
-      name : "app",
-      exclude: ['jquery']
+      name : "client",
+      exclude: []
     }
   ]
 })
