@@ -160,12 +160,15 @@ if(require.main === module) {
           var clientContents = fs.readFileSync(appFile,'utf8'),
               viewFiles = fs.readdirSync(viewFolder),
               viewObjectPattern = /viewObject\s*=\s*(\{[^\{\}]*\})/,
-              viewObjectMatches = clientContents.match(viewObjectPattern);
+              viewObjectMatches = clientContents.match(viewObjectPattern),
+              viewArrayPattern = /define\((\[[^\]]*\])?/,
+              viewArrayMatches = clientContents.match(viewArrayPattern);
           if(!viewObjectMatches || !viewObjectMatches[1] || !parseJSON(viewObjectMatches[1])){
             console.error('Error updating views. app.js does not appear to define a valid viewObject.');
             process.exit(1);
           }
           var viewObject = parseJSON(viewObjectMatches[1]),
+              viewArray = parseJSON((viewArrayMatches && viewArrayMatches[1]) || '[]');
               viewHtmlTemplate = fs.readFileSync(__dirname + '/templates/view.html','utf8'),
               viewTemplate = fs.readFileSync(__dirname + '/templates/view.js','utf8');
           // loop through the views in viewRoutes
@@ -173,6 +176,7 @@ if(require.main === module) {
             if(!~viewFiles.indexOf(viewName + '.js')){
               // we don't have this view yet, add it.
               viewObject[requireViewPath + viewName] = viewName;
+              viewArray.push(requireViewPath + viewName);
               if(viewRoutes[viewName]){
                 // we have a route for this view.
                 viewObject[requireViewPath+viewName] += "/" + viewRoutes[viewName].replace(/^\//,'');
@@ -200,7 +204,9 @@ if(require.main === module) {
               process.exit(1);
             }
           }
-          var newClient = clientContents.replace(viewObjectPattern,'viewObject = ' + JSON.stringify(viewObject));
+          var newClient = clientContents
+                            .replace(viewObjectPattern,'viewObject = ' + JSON.stringify(viewObject,2))
+                            .replace(viewArrayPattern,'define(' + JSON.stringify(viewArray,2));
           console.log('updating view object in views.js');
           fs.writeFileSync(appFile,newClient,'utf8');
         } else {
@@ -224,14 +230,19 @@ if(require.main === module) {
           var clientContents = fs.readFileSync(appFile,'utf8'),
               viewFiles = fs.readdirSync(viewFolder),
               viewObjectPattern = /viewObject\s*=\s*(\{[^\{\}]*\})/,
-              viewObjectMatches = clientContents.match(viewObjectPattern);
+              viewObjectMatches = clientContents.match(viewObjectPattern),
+              viewArrayPattern = /define\((\[[^\]]*\])?/,
+              viewArrayMatches = clientContents.match(viewArrayPattern);
           if(!viewObjectMatches || !viewObjectMatches[1] || !parseJSON(viewObjectMatches[1])){
             console.error('Error updating views. app.js does not appear to define a valid viewObject.');
             process.exit(1);
           }
           var viewObject = parseJSON(viewObjectMatches[1]);
           delete viewObject[requireViewPath + name];
-          var newClient = clientContents.replace(viewObjectPattern,'viewObject = ' + JSON.stringify(viewObject,2));
+          viewArray.splice(viewArray.indexOf(requireViewPath + viewName),1);
+          var newClient = clientContents
+                            .replace(viewObjectPattern,'viewObject = ' + JSON.stringify(viewObject,2))
+                            .replace(viewArrayPattern,'define(' + JSON.stringify(viewArray,2));
           console.log('updating view object in views.js');
           fs.writeFileSync(appFile,newClient,'utf8');
           console.log('removing view files');
