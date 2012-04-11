@@ -20,6 +20,17 @@ define(
       viewName = viewNameMatches[1];
       route = viewObject[viewPath];
       views[viewName] = viewsArray[viewNum];
+      // if this route has optional params, convert to regex
+      if(route.match(/:\w+\?/)){
+        var optionPattern = /:(\w+)(\?)?\/?/g, match, regex="/",num=0;
+        while(match = optionPattern.exec(route)){
+          if(num) regex += match[2] ? "\\/?" : "\\/";
+          regex += "([^\\/]+)" +(match[2]?"?":"");
+          num++;
+        }
+        regex += "/";
+        route = regex;
+      }
       // detect if this route a regex (just checks for slashes right now)
       if(route.match(/^\/(.+?[^\\]\/)+\w*$/)){
         // convert to regexp object
