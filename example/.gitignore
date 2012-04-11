@@ -1,0 +1,7 @@
+.DS_Store
+nohup.out
+public
+docs
+npm-debug.log
+config/runtime.json
+tmp

@@ -84,9 +84,9 @@ if(require.main === module) {
       // set up our app basics:
       var prompts = [
           ['prompt','What is your name?: ',function(author){ options.author = author; }],
-          ['prompt','What is your email address?: ',function(email){ options.author += "<"+email+">"; }],
+          ['prompt','What is your email address?: ',function(email){ options.author += " <"+email+">"; }],
           ['prompt','Give your creation a name: ',function(name){ options.name = name.replace(' ','-'); }],
-          ['prompt','Describe your creation: ',function(desc){ options.desc = desc; }]
+          ['prompt','Describe your creation: ',function(desc){ options.description = desc; }]
         ],
         // loops through commands until they are finished.
         doCommands = function(callback,i){
