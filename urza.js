@@ -342,25 +342,29 @@ if(require.main === module) {
   // ------------
 
   var express = require('express'),
-      cluster = require('cluster'),
       fs = require('fs'),
+      cluster = require('cluster'),
       path = require('path'),
       gzippo = require('gzippo');
 
   // Module Dependencies
   // -------------------
   var logger = require('./lib/logging/logger.js'),
-    reqLogger = require('./lib/logging/requestLogger.js'),
-    expressHandlebars = require('./lib/helpers/express-handlebars.js'),
-    useragent = require('./lib/helpers/middleware/useragent.js'),
-    render = require('./lib/helpers/middleware/render.js'),
-    api = require('./lib/api.js');
+      reporter = require('./lib/logging/reporter.js'),
+      reqLogger = require('./lib/logging/requestLogger.js'),
+      expressHandlebars = require('./lib/helpers/express-handlebars.js'),
+      useragent = require('./lib/helpers/middleware/useragent.js'),
+      render = require('./lib/helpers/middleware/render.js'),
+      api = require('./lib/api.js');
 
   // Urza App Class
   // --------------
   var UrzaServer = module.exports.Server = function(options){
     this.options = options;
     this.app = this.createApp();
+    this.cluster = cluster;
+    this.logger = logger;
+    this.reporter = reporter;
     if(options.configure){
       options.configure(this.app);
     }
