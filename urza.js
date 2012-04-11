@@ -361,6 +361,7 @@ if(require.main === module) {
   // --------------
   var UrzaServer = module.exports.Server = function(options){
     this.options = options;
+    this.publicDir = this.options.environment == "development" ? "client" : "public";
     this.app = this.createApp();
     this.cluster = cluster;
     this.logger = logger;
@@ -383,8 +384,8 @@ if(require.main === module) {
       var numCpus = require('os').cpus().length;
     	// in production, set up cluster
     	if (cluster.isMaster) {
-    		if (this.options.numberOfWorkers){
-    			var numberOfWorkers = config.numberOfWorkers;
+    		if (this.options.maxCpus){
+    			var numberOfWorkers = this.options.maxCpus;
     		} else {
     			if (numCpus>1) {
     				var numberOfWorkers = numCpus; 
@@ -428,7 +429,7 @@ if(require.main === module) {
       this.configureTemplates(app);
       // middleware
     	app.use(express.methodOverride());
-      app.use(express.static('./client'));
+      app.use(express.static('./' + this.publicDir));
       app.use(express.static(__dirname + '/client'));
       app.use(gzippo.compress());
       // if authenticate is specified, use the path specified as the authenticate middleware.
