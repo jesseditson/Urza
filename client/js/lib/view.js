@@ -20,6 +20,15 @@ define(['jquery','external/require-backbone'],function($,Backbone){
       },this));
     },this);
   }
+  var hijackLinks = function(view){
+    view.$el.find('a:not(.external)').each(function(){
+      var link = $(this);
+      link.click(function(){
+        view.navigate(link.attr('href'));
+        return false;
+      });
+    });
+  }
   var getJSON = function(string){
     var d = {};
     try {
@@ -48,11 +57,13 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     this.obj.render = render;
   }
   // setter and getter for attribute data
+  View.prototype.set = function(key,val){
+    if(!this.view) throw new Error('tried to set an attribute on a non-showing view.');
+    if(!this.view.attributes) this.view.attributes = {};
+    this.view.attributes[key] = val;
+  }
   View.prototype.get = function(attr){
     return this.attributes[attr];
-  }
-  View.prototype.set = function(attr,data){
-    this.attributes[attr] = data;
   }
   // on - adds a method to an event.
   // uses same syntax as backbone's view events 
@@ -83,6 +94,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     // when this has been called twice (once from the post, once from the transition)
     var done = _.after(2,_.bind(function(){
       this.hideLoading();
+      hijackLinks(this.view);
       if(callback) callback();
       if(this.view.postRender) this.view.postRender();
     },this));
@@ -146,6 +158,14 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     if(partial){
       render(partial.name,partial.url,partial.obj,partial.el,callback);
     }
+  }
+  // render a view or partial and return it
+  View.prototype.getView = function(name,url,obj,el){
+    if(!el){
+      el = obj;
+      obj = {};
+    }
+    render(name,url,obj,el);
   }
   // remove the whole view.
   View.prototype.remove = function(){

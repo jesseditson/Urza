@@ -42,6 +42,69 @@ vows.describe('Providers Module').addBatch({
         assert.isObject(user);
         assert(user.updated);
       }
+    },
+    'when calling an overriden method on users provider' : {
+      topic : function(providers){
+        providers.users.create({id:"test","foo":"bar","old":"yes"},this.callback);
+      },
+      'it calls the new method' : function(err,user){
+        assert.isNull(err);
+        assert.isFalse(user[0] instanceof Error);
+        assert.isFalse(user[0] instanceof TypeError);
+        assert.isObject(user);
+        assert.equal(user.id,'test');
+      },
+      'and when upserting on that id' : {
+        topic : function(a,providers){
+          providers.users.create({id:"test","foo":"bar","old":"no"},this.callback);
+        },
+        'it has updated the field' : function(err,user){
+          assert.isNull(err);
+          assert.isFalse(user[0] instanceof Error);
+          assert.isFalse(user[0] instanceof TypeError);
+          assert.isObject(user);
+          assert.equal(user.old,'no');
+        },
+        'and when looking up by a common field' : {
+          topic : function(a,b,providers){
+            providers.users.findAllByField('foo','bar',this.callback);
+          },
+          'it has not created a new record' : function(err,users){
+            assert.isNull(err);
+            assert.isFalse(users[0] instanceof Error);
+            assert.isFalse(users[0] instanceof TypeError);
+            assert.isArray(users);
+            assert.equal(users.length,1);
+          },
+          'and it does not return the foo field because it is not in the defaultFields.' : function(err,users){
+            assert.isNull(err);
+            assert.isFalse(users[0] instanceof Error);
+            assert.isFalse(users[0] instanceof TypeError);
+            assert.isArray(users);
+            assert.isUndefined(users[0].foo);
+          },
+          'but if asked for' : {
+            topic:function(a,b,c,providers){
+              providers.users.findAllByField('foo','bar',['foo'],this.callback);
+            },
+            'it does return the field' : function(err,users){
+              assert.isNull(err);
+              assert.isFalse(users[0] instanceof Error);
+              assert.isFalse(users[0] instanceof TypeError);
+              assert.isArray(users);
+              assert(users[0].foo);
+            },
+            'it returns no other fields except the id' : function(err,users){
+              assert.isNull(err);
+              assert.isFalse(users[0] instanceof Error);
+              assert.isFalse(users[0] instanceof TypeError);
+              assert.isArray(users);
+              assert.isUndefined(users[0].id);
+              assert(users[0]._id);
+            }
+          }
+        }
+      }
     }
   }
 }).export(module);

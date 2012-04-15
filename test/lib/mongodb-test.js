@@ -92,7 +92,7 @@ vows.describe('MongoDB Module').addBatch({
     },
     'when trying to find with an array of 2 _ids' : {
       topic : function(mongo){
-        mongo.findByIds('users',["4f87645b12ed3b480cdd77df","4f87645b12ed3b480cdd77e3"],this.callback);
+        mongo.findByIds('users',["4f4ed63f571c15cdd331ef0d","4f4ed63e571c15cdd331ef0c"],this.callback);
       },
       'calls back with an array of 2 users' : function(err,users){
         assert.isNull(err);

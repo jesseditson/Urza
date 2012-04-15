@@ -6,7 +6,7 @@ process.env['NODE_CONFIG_DIR'] = __dirname + '/../fixtures/config';
 
 var vows = require('vows'),
     assert = require('assert'),
-    Api = require('../../lib/api.js').testApi;
+    Api = require('../../lib/api.js');
 
 // Local Variables & Helpers
 // -------------------------

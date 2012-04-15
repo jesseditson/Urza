@@ -60,7 +60,7 @@ Users.prototype.refresh = function(user,callback){
 
 Users.prototype.updateAndReturn = function(id,data,callback){
   this.db.update('users',{_id : id},{$set : data},function(err){
-    this.findById(id,function(err,user){
+    this.findById(id,['updated'],function(err,user){
       callback(err,user);
     });
   }.bind(this));

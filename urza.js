@@ -367,7 +367,7 @@ if(require.main === module) {
       expressHandlebars = require('./lib/helpers/express-handlebars.js'),
       useragent = require('./lib/helpers/middleware/useragent.js'),
       render = require('./lib/helpers/middleware/render.js'),
-      api = require('./lib/api.js');
+      api = new require('./lib/api.js')();
   // Urza App Class
   // --------------
   var UrzaServer = module.exports.Server = function(options){
