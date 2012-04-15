@@ -9,5 +9,8 @@ var User = module.exports = {
   },
   'something' : function(session,body,callback){
     callback(null,"HELLO");
+  },
+  'test' : function(session,body,callback){
+    this.providers.users.findById(body._id,callback);
   }
 }

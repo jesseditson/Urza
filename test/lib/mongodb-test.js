@@ -113,7 +113,7 @@ vows.describe('MongoDB Module').addBatch({
       },
       'and when looking up the record' : {
         topic : function(a,mongo){
-          mongo.findById('users',"4f4ed63f571c15cdd331ef0d",this.callback);
+          mongo.findById('users',"4f4ed63f571c15cdd331ef0d",['updateOne'],this.callback);
         },
         'it has been updated' : function(err,user){
           assert.isNull(err);

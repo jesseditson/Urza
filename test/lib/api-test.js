@@ -18,7 +18,7 @@ var helpers = require('../fixtures/helpers.js');
 vows.describe('Api Module').addBatch({
   'The Api Module' : {
     topic:function(){
-      var api = new Api({apidir : __dirname + "/../fixtures/api"});
+      var api = new Api({apidir : __dirname + "/../fixtures/api",providerdir : __dirname + '/../fixtures/providers'});
       this.callback(null,api);
     },
     'with a readycallback' : {
@@ -41,6 +41,18 @@ vows.describe('Api Module').addBatch({
         },
         'the route returns what we expected' : function(data){
           assert.strictEqual(data,'HELLO');
+        }
+      },
+      'it has loaded providers from the providerdir option folder' : function(api){
+        assert(api.providers.users);
+      },
+      'when calling a route that uses a provider' : {
+        topic : function(api){
+          api.route(['user','test'],{},{_id : "4f4ed63f571c15cdd331ef0d"},this.callback);
+        },
+        'the route returns an object from the db' : function(data){
+          assert.isFalse(data instanceof Error);
+          assert(data);
         }
       }
     }
