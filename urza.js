@@ -368,7 +368,6 @@ if(require.main === module) {
       useragent = require('./lib/helpers/middleware/useragent.js'),
       render = require('./lib/helpers/middleware/render.js'),
       api = require('./lib/api.js');
-
   // Urza App Class
   // --------------
   var UrzaServer = module.exports.Server = function(options){
@@ -490,7 +489,7 @@ if(require.main === module) {
   // configures the templating engine we want to work with.
   // TODO: may need larger abstraction of view logic.
   UrzaServer.prototype.configureTemplates = function(app){
-    switch(this.options.templates.engine){
+    switch(this.options.templates && this.options.templates.engine){
       case 'handlebars' :
         // set up view engine
         app.set('view engine','html');
@@ -504,17 +503,20 @@ if(require.main === module) {
     }
     return app;
   }
+  
+  // **Call Api Method**
+  // directly call the api
+  UrzaServer.prototype.callApi = function(params,session,body,callback){
+    var params = params[0] ? params[0].split('/') : [];
+    api.route(params,session,body,callback);
+  }
 
   // **Set up Routes**
   // sets up Urza's default routes
   UrzaServer.prototype.addRoutes = function(app){
     // **API Route**
-    var callApi = function(params,session,body,callback){
-      var params = params[0] ? params[0].split('/') : [];
-      api.route(params,session,body,callback);
-    }
     app.all("/api/*",function(req,res,next){
-      callApi(req.params,req.session,req.body,function(err,response){
+      this.callApi(req.params,req.session,req.body,function(err,response){
         if(err){
           res.json(err.message,500);
         } else {
@@ -530,7 +532,7 @@ if(require.main === module) {
       var params = req.params[1] ? [req.params[1]] : [],
           name = req.params[0];
       if(params.length){
-        callApi(params,req.session,req.body,function(err,response){
+        this.callApi(params,req.session,req.body,function(err,response){
          if(err){
            res.json(err.message,500);
          } else {
@@ -545,7 +547,7 @@ if(require.main === module) {
       } else {
         res.render('partials/'+name,{layout:false});
       }
-    });
+    }.bind(this));
     // **View Route**
     // Renders a view
     app.all('/view/:name',function(req,res,next){

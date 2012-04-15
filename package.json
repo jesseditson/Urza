@@ -33,7 +33,8 @@
   },
   "devDependencies": {
     "vows" : "0.6.x",
-    "docco" : "0.3.x"
+    "docco" : "0.3.x",
+    "request" : "2.9.x"
   },
   "optionalDependencies": {}
 }

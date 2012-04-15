@@ -14,9 +14,9 @@ define(['jquery','external/require-backbone'],function($,Backbone){
   };
   var addMethods = function(view){
     // expose the navigate function on views
-    view.navigate = _.bind(function(page,replace){
+    view.navigate = _.bind(function(page,replace,trigger){
       this.transitionOut(_.bind(function(){
-        this.router.navigate(page, {trigger: true, replace:replace===false || false});
+        this.router.navigate(page, {trigger: trigger===false || true, replace:replace===false || false});
       },this));
     },this);
   }

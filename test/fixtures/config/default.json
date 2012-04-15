@@ -1,0 +1,16 @@
+{
+  "environment" : "production",
+	"serverPort": "8080",
+  "db" : {
+    "name" : "test",
+    "host":"localhost",
+    "port":27017
+  },
+	"hostname" : "http://www.grazzee.com",
+	"sessionSecret" : "supersecretkeygoeshere",
+  "logFiles" : false,
+  "templates" : {
+    "engine" : "handlebars"
+  },
+  "schemadir" : "/test/fixtures/schemas"  
+}
