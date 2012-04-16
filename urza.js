@@ -367,12 +367,13 @@ if(require.main === module) {
       expressHandlebars = require('./lib/helpers/express-handlebars.js'),
       useragent = require('./lib/helpers/middleware/useragent.js'),
       render = require('./lib/helpers/middleware/render.js'),
-      api = new require('./lib/api.js')();
+      Api = require('./lib/api.js');
   // Urza App Class
   // --------------
   var UrzaServer = module.exports.Server = function(options){
     this.options = options;
     this.publicDir = this.options.environment == "development" ? "client" : "public";
+    this.api = new Api();
     this.app = this.createApp();
     this.cluster = cluster;
     this.logger = logger;
@@ -508,7 +509,7 @@ if(require.main === module) {
   // directly call the api
   UrzaServer.prototype.callApi = function(params,session,body,callback){
     var params = params[0] ? params[0].split('/') : [];
-    api.route(params,session,body,callback);
+    this.api.route(params,session,body,callback);
   }
 
   // **Set up Routes**
@@ -523,7 +524,7 @@ if(require.main === module) {
           res.json(response);
         }
       });
-    });
+    }.bind(this));
     //**Partial Route**
     // renders a partial based on an api call
     app.all(/\/partial\/([^\/]+)\/?(.+)?/,function(req,res,next){
