@@ -58,12 +58,11 @@ define(['jquery','external/require-backbone'],function($,Backbone){
   }
   // setter and getter for attribute data
   View.prototype.set = function(key,val){
-    if(!this.view) throw new Error('tried to set an attribute on a non-showing view.');
-    if(!this.view.attributes) this.view.attributes = {};
-    this.view.attributes[key] = val;
+    if(!this.attributes) this.attributes = {};
+    this.attributes[key] = val;
   }
   View.prototype.get = function(attr){
-    return this.attributes[attr];
+    return this.attributes && this.attributes[attr];
   }
   // on - adds a method to an event.
   // uses same syntax as backbone's view events 
