@@ -446,7 +446,7 @@ if(require.main === module) {
       app.use(gzippo.compress());
       // if authenticate is specified, use the path specified as the authenticate middleware.
       if(this.options.authenticate){
-        app.use(require(process.cwd() + '/' + this.options.authenticate));
+        app.use(require(process.cwd() + '/' + this.options.authenticate).bind(this));
       }
     	app.use(useragent);
     	app.use(render);

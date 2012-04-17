@@ -21,7 +21,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     },this);
   }
   var hijackLinks = function(view){
-    view.$el.find('a:not(.external)').each(function(){
+    view.$el.find('a[href]').each(function(){
       var link = $(this);
       link.click(function(){
         view.navigate(link.attr('href'));
