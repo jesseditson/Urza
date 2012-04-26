@@ -3,8 +3,9 @@
   baseUrl : "js",
   dir : "../../../../../public",
   optimize : "uglify",
+  preserveLicenseComments: false,
   paths : {
-    "jquery" : "../../node_modules/urza/client/js/external/require-jquery",
+    "jquery" : "../../node_modules/urza/client/js/external/require-jquery-min",
     "external/amplify" : "../../node_modules/urza/client/js/external/amplify",
     "external/app" : "../../node_modules/urza/client/js/external/app",
     "lib/router" : "../../node_modules/urza/client/js/lib/router",

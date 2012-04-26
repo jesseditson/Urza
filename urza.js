@@ -442,8 +442,8 @@ if(require.main === module) {
       // middleware
     	app.use(express.methodOverride());
       var oneYear = 31557600000;
-      app.use(express.static('./' + this.publicDir,{ maxAge: oneYear }));
-      app.use(express.static(__dirname + '/client',{ maxAge: oneYear }));
+      app.use(gzippo.staticGzip('./' + this.publicDir,{ maxAge: oneYear }));
+      app.use(gzippo.staticGzip(__dirname + '/client',{ maxAge: oneYear }));
       app.use(gzippo.compress());
       // if authenticate is specified, use the path specified as the authenticate middleware.
       if(this.options.authenticate){
