@@ -2,7 +2,7 @@
   appDir : "../../../../../client",
   baseUrl : "js",
   dir : "../../../../../public",
-  optimize : "none",
+  optimize : "uglify",
   paths : {
     "jquery" : "../../node_modules/urza/client/js/external/require-jquery",
     "external/amplify" : "../../node_modules/urza/client/js/external/amplify",
