@@ -7,8 +7,8 @@ define(['jquery','external/require-backbone'],function($,Backbone){
       data : data,
       type : 'post',
       success : function(res){
-        $(el).html(res);
-        if(callback) callback();
+        if(el) $(el).html(res);
+        if(callback) callback(res);
       }
     });
   };
@@ -91,12 +91,12 @@ define(['jquery','external/require-backbone'],function($,Backbone){
   View.prototype.show = function(data,callback){
     data = data || {};
     // when this has been called twice (once from the post, once from the transition)
-    var done = _.after(2,_.bind(function(){
+    var done = _.after(2,_.bind(function(data){
       this.hideLoading();
       hijackLinks(this.view);
       if(callback) callback();
-      if(this.view.postRender) this.view.postRender();
-    },this));
+      if(this.view.postRender) this.view.postRender(data);
+    },this,data));
     // change UI to show that this is transitioning.
     this.transitionIn(_.bind(function(){
       this.showLoading();
@@ -144,7 +144,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
         // make data accessible.
         this.set("data",data);
         // finally, render the view
-        view.render();
+        view.render(data);
         if(partials.length==0){
           done();
         }
@@ -159,12 +159,13 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     }
   }
   // render a view or partial and return it
-  View.prototype.getView = function(name,url,obj,el){
-    if(!el){
-      el = obj;
-      obj = {};
+  View.prototype.getView = function(partial,api,data,el,callback){
+    if(!el && !callback){
+      callback = data;
+      el = null;
+      data = {};
     }
-    render(name,url,obj,el);
+    render(partial,api,data,el,callback);
   }
   // remove the whole view.
   View.prototype.remove = function(){
