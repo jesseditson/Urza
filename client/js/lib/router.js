@@ -1,10 +1,13 @@
 define(['external/require-backbone'],function(Backbone){
   // Router Class
   // Basically just a wrapper for the backbone router, which obscures backbone's annoying syntax.
+  // make router available in private methods
   var Router = function(routes){
     this.routeObject = routes || {};
     var router = Backbone.Router.extend(this.routeObject);
     this.router = new router();
+    this.history = [];
+    this.lastpage = "";
     this.onLeave;
   };
   // Override the Backbone loadUrl method to allow us to respond to ALL hashchange events.
@@ -16,10 +19,23 @@ define(['external/require-backbone'],function(Backbone){
   
   // helpers
   var hashChanged = function(){
+    if(this.router.preventNext){
+      delete this.router.preventNext;
+    } else {
+      this.router.lastpage = this.router.history[this.router.history.length-1] || "";
+    }
+    this.router.history.push(window.location.pathname);
     if(this.onLeave){
       this.onLeave();
       delete this.onLeave;
     }
+  }
+  // back - navigates backwards in history
+  Router.prototype.back = function(){
+    this.lastpage = this.history.pop();
+    this.preventNext = true;
+    var page = this.history.pop();
+    this.navigate(page,{trigger:true,replace:true});
   }
   // callback to execute when we leave the currentPage
   Router.prototype.cleanup = function(action,context){
