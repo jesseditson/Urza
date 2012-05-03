@@ -19,6 +19,9 @@ define(['jquery','external/require-backbone'],function($,Backbone){
         this.router.navigate(page, {trigger: trigger===false || true, replace:replace===false || false});
       },this));
     },this);
+    view.back = _.bind(function(){
+      this.router.back();
+    },this);
   }
   var hijackLinks = function(view){
     view.$el.find('a[href]').each(function(){
