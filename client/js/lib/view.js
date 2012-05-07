@@ -25,11 +25,14 @@ define(['jquery','external/require-backbone'],function($,Backbone){
   }
   var hijackLinks = function(view){
     view.$el.find('a[href]').each(function(){
-      var link = $(this);
-      link.click(function(){
-        view.navigate(link.attr('href'));
-        return false;
-      });
+      var link = $(this),
+          href = link.attr('href');
+      if(!href.match(/^http/) && !link.is('.external')){
+        link.click(function(){
+          view.navigate(href);
+          return false;
+        });
+      }
     });
   }
   var getJSON = function(string){
