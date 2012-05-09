@@ -17,7 +17,6 @@ if(require.main === module) {
       mkdirp = require('mkdirp'),
       async = require('async'),
       exec = require('child_process').exec,
-      _ = require('underscore'),
       program = require('commander');
 
   // **Main Urza file. This does all sorts of handy tasks.**
@@ -357,6 +356,7 @@ if(require.main === module) {
   var express = require('express'),
       fs = require('fs'),
       cluster = require('cluster'),
+      _ = require('underscore'),
       path = require('path'),
       gzippo = require('gzippo');
 
@@ -540,7 +540,7 @@ if(require.main === module) {
            res.json(err.message,500);
          } else {
            data = {
-             data : response,
+             data : _.extend(response,req.body),
              layout : false
            };
            logger.info('partial request complete.',req.timer);
