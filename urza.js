@@ -17,6 +17,7 @@ if(require.main === module) {
       mkdirp = require('mkdirp'),
       async = require('async'),
       exec = require('child_process').exec,
+      _ = require('underscore'),
       program = require('commander');
 
   // **Main Urza file. This does all sorts of handy tasks.**
