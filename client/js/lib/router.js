@@ -47,7 +47,15 @@ define(['external/require-backbone'],function(Backbone){
     this.router.route.apply(this.router,arguments);
   }
   Router.prototype.navigate = function(){
-    this.router.navigate.apply(this.router,arguments);
+    var args = Array.prototype.slice.call(arguments);
+    // default to true for navigate and trigger
+    if(!args[1]){
+      args[1] = {trigger: true, replace: false};
+    } else {
+      if(args[1].trigger !== false) args[1].trigger = true;
+      if(args[1].replace !== false) args[1].replace = true;
+    }
+    this.router.navigate.apply(this.router,args);
   }
   // start method - use after all routes are in place.
   Router.prototype.start = function(){
