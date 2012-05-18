@@ -380,7 +380,7 @@ if(require.main === module) {
     this.logger = logger;
     this.reporter = reporter;
     if(options.configure){
-      options.configure(this.app);
+      options.configure(this.app,this);
     }
     this.addRoutes(this.app);
     // mimic the routing behavior of express.
