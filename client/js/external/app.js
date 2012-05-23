@@ -41,7 +41,7 @@ define(
         var pattern = route.replace(/^\/(.+?)\/\w*$/,"$1").replace(/(\\)/,"\$1"),
             flags = route.replace(/^\/.+?\/(\w*)$/,"$1");
         route = new RegExp(viewName + '/' +pattern,flags);
-      } else if(!~raw.indexOf(viewName)) {
+      } else if(!~_.indexOf(raw,viewName)) {
         route = viewName + ((route) ? '/' + route : "");
       }
       viewRoutes[viewName] = route;
