@@ -108,7 +108,6 @@ define(['jquery','external/require-backbone'],function($,Backbone){
       this.showLoading();
       done();
     },this));
-    
     $.ajax({
       url : '/view/' + this.name,
       data : data,
@@ -134,7 +133,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
             partial = view.partials[p.attr('data-partial')] = {
               name : p.attr('data-partial'),
               url : p.attr('data-url'),
-              obj : getJSON(p.attr('data-obj')),
+              obj : _.extend(data,getJSON(p.attr('data-obj'))),
               el : p
             }
           p.removeAttr('data-partial');
