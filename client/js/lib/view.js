@@ -14,14 +14,8 @@ define(['jquery','external/require-backbone'],function($,Backbone){
   };
   var addMethods = function(view){
     // expose the navigate function on views
-    view.navigate = _.bind(function(page,replace,trigger){
-      this.transitionOut(_.bind(function(){
-        this.router.navigate(page, {trigger: trigger===false || true, replace:replace===false || false});
-      },this));
-    },this);
-    view.back = _.bind(function(){
-      this.router.back();
-    },this);
+    view.navigate = this.navigate
+    view.back = this.back
   }
   var hijackLinks = function(view){
     view.$el.find('a[href]').each(function(){
@@ -53,6 +47,34 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     // obj can just be a regular backbone object, or empty.
     this.obj = obj || { events : {} };
     this.attributes = {};
+    this.initialized = false
+  }
+  // perform initialization 
+  View.prototype.initialize = function(){
+    if(!this.router){
+      throw new Error("Tried to initialize view, but it is missing a router.")
+    } else if(!this.initialized) {
+      this.navigate = _.bind(function(page,replace,trigger){
+        var refresh = (page==this.router.history[this.router.history.length-1])
+        if(refresh){
+          // don't navigate to the exact same page twice.
+          return false
+        } else {
+          if(typeof replace == 'object'){
+            // allow passing of object
+            trigger = replace.trigger
+            replace = replace.replace
+          }
+          this.transitionOut(_.bind(function(){
+            this.router.navigate(page, {trigger: trigger===false || true, replace:replace===false || false});
+          },this));
+        }
+      },this);
+      this.back = _.bind(function(){
+        this.router.back();
+      },this);
+      this.initialized = true
+    }
   }
   // accessor for post render 
   View.prototype.postRender = function(postRender){
@@ -121,8 +143,9 @@ define(['jquery','external/require-backbone'],function($,Backbone){
         this.obj.el = container.find("#"+this.name)[0];
         $(this.obj.el).html(html);
         // set up the view.
-        var view = this.view = new (Backbone.View.extend(this.obj))();
-        addMethods.call(this,view);
+        if(!this.initialized) this.initialize()
+        var view = this.view = new (Backbone.View.extend(this.obj))()
+        addMethods.call(this,view)
         // set up partials based on data attributes
         view.partials = {};
         var partials = view.$el.find('[data-partial]'),

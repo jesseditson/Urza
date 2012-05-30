@@ -63,6 +63,7 @@ define(
         console.error('Failed Loading view %s',name);
       } else {
         view.router = router;
+        view.routePath = viewRoutes[name]
         router.route(viewRoutes[name],name,_.bind(function(){
           if(this.route){
             this.route.apply(this,arguments);
@@ -70,6 +71,7 @@ define(
             app.defaultRoute.apply(this,arguments);
           }
         },view));
+        view.initialize()
       }
     }
     return app;
