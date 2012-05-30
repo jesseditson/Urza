@@ -71,7 +71,9 @@ define(['jquery','external/require-backbone'],function($,Backbone){
         }
       },this);
       this.back = _.bind(function(){
-        this.router.back();
+        this.transitionOut(_.bind(function(){
+          this.router.back();
+        },this));
       },this);
       this.initialized = true
     }
