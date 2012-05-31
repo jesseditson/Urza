@@ -459,6 +459,7 @@ if(require.main === module) {
       var oneYear = 31557600000;
       app.use(gzippo.staticGzip('./' + this.publicDir,{ maxAge: oneYear }));
       app.use(express.static(__dirname + '/client',{ maxAge: oneYear }));
+      app.use(gzippo.compress());
       // if authenticate is specified, use the path specified as the authenticate middleware.
       if(this.options.authenticate){
         app.use(require(process.cwd() + '/' + this.options.authenticate).bind(this));
