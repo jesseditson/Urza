@@ -3,6 +3,7 @@
   baseUrl : "js",
   dir : "../../../../../public",
   optimize : "uglify",
+  optimizeCss : "standard",
   preserveLicenseComments: false,
   paths : {
     "jquery" : "../../node_modules/urza/client/js/external/require-jquery-min",
