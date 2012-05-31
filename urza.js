@@ -379,6 +379,8 @@ if(require.main === module) {
     this.cluster = cluster;
     this.logger = logger;
     this.reporter = reporter;
+    this.workers = [];
+    this.workerMethods = {};
     if(options.configure){
       options.configure(this.app,this);
     }
@@ -401,17 +403,29 @@ if(require.main === module) {
     			var numberOfWorkers = this.options.maxCpus;
     		} else {
     			if (numCpus>1) {
-    				var numberOfWorkers = numCpus; 
+    				var numberOfWorkers = numCpus;
     			} else {
     				var numberOfWorkers = 2;
     			};
     		}
+        var forkWorker = function(){
+    			var worker = cluster.fork();
+          this.workers.push(worker);
+          // allow communication to this worker
+          worker.on('message',function(worker,message){
+            if(this.workerMethods[message.method]){
+              this.workerMethods[message.method].call(this,message.data)
+            } else {
+              logger.silly('worker tried to call method ' + message.method + ', but it does not exist. Data: ',message.data)
+            }
+          }.bind(this,worker))
+        }.bind(this)
     		for(var i=0; i< numberOfWorkers; i++) {
-    			cluster.fork();
+    			forkWorker()
     		}
     	 	cluster.on('death', function(worker) {
-    			cluster.fork();
-    	  	});
+    			forkWorker()
+  	  	});
     	} else {
     		this.app.listen(this.options.serverPort);
     		logger.debug("Urza server master started listening on port: " + this.options.serverPort)
