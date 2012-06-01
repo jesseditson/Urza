@@ -36,6 +36,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     } catch(e){}
     return d;
   }
+  var lastPage
   // View class
   // mostly just a wrapper for backbone's view, obscures the annoying syntax.
   var View = function(name,obj){
@@ -55,7 +56,9 @@ define(['jquery','external/require-backbone'],function($,Backbone){
       throw new Error("Tried to initialize view, but it is missing a router.")
     } else if(!this.initialized) {
       this.navigate = _.bind(function(page,replace,trigger){
-        var refresh = (page==this.router.history[this.router.history.length-1])
+        // previously: page==this.router.history[this.router.history.length-1] && 
+        var refresh = ((page == lastPage || !lastPage))
+        lastPage = page
         if(refresh){
           // don't navigate to the exact same page twice.
           return false
