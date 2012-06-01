@@ -57,7 +57,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     } else if(!this.initialized) {
       this.navigate = _.bind(function(page,replace,trigger){
         // previously: page==this.router.history[this.router.history.length-1] && 
-        var refresh = ((page == lastPage || !lastPage))
+        var refresh = (page == lastPage)
         lastPage = page
         if(refresh){
           // don't navigate to the exact same page twice.
