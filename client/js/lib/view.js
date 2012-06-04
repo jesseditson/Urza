@@ -57,7 +57,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
     } else if(!this.initialized) {
       this.navigate = _.bind(function(page,replace,trigger){
         // previously: page==this.router.history[this.router.history.length-1] && 
-        var refresh = (page == lastPage)
+        var refresh = (page == lastPage || (!window.location.hash && window.location.pathname == page))
         lastPage = page
         if(refresh){
           // don't navigate to the exact same page twice.
@@ -68,7 +68,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
             trigger = replace.trigger
             replace = replace.replace
           }
-          this.transitionOut(_.bind(function(){
+          this.transitionOut(_.bind(function(lastPage){
             this.router.navigate(page, {trigger: trigger===false || true, replace:replace===false || false});
           },this));
         }
