@@ -35,7 +35,7 @@ define(['external/require-backbone'],function(Backbone){
     this.lastpage = this.history.pop();
     this.preventNext = true;
     var page = this.history.pop();
-    this.navigate(page,{trigger:true,replace:true});
+    this.navigate(page,{trigger:true,replace:false});
   }
   // callback to execute when we leave the currentPage
   Router.prototype.cleanup = function(action,context){

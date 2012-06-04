@@ -60,6 +60,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
         var refresh = (page == lastPage || (!window.location.hash && window.location.pathname == page))
         lastPage = page
         if(refresh){
+          console.log('navigate called but already on page',page)
           // don't navigate to the exact same page twice.
           return false
         } else {
