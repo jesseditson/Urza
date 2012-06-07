@@ -6,10 +6,11 @@ define(['jquery','external/require-backbone'],function($,Backbone){
       url : '/partial/' + partial + '/' + api,
       data : data,
       type : 'post',
-      success : function(res){
+      success : _.bind(function(res){
         if(el) $(el).html(res);
         if(callback) callback(res);
-      }
+        if(this.renderCallback) this.renderCallback.apply(this,arguments)
+      },this)
     });
   };
   var addMethods = function(view){
@@ -168,7 +169,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
           p.removeAttr('data-partial');
           p.removeAttr('data-url');
           p.removeAttr('data-obj');
-          render(partial.name,partial.url,partial.obj,partial.el,function(){
+          render.call(this,partial.name,partial.url,partial.obj,partial.el,function(){
             partialsRendered ++;
             if(partialsRendered==partials.length){
               done();
@@ -189,7 +190,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
   View.prototype.renderPartial = function(name,callback){
     var partial = this.view.partials[name];
     if(partial){
-      render(partial.name,partial.url,partial.obj,partial.el,callback);
+      render.call(this,partial.name,partial.url,partial.obj,partial.el,callback);
     }
   }
   // render a view or partial and return it
@@ -199,7 +200,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
       el = null;
       data = {};
     }
-    render(partial,api,data,el,callback);
+    render.call(this,partial,api,data,el,callback);
   }
   // remove the whole view.
   View.prototype.remove = function(){
