@@ -60,7 +60,7 @@ define(
     for(var name in views){
       var view = views[name];
       if(!view){
-        console.error('Failed Loading view %s',name);
+        if(typeof console !== 'undefined') console.error('Failed Loading view %s',name);
       } else {
         view.router = router;
         view.routePath = viewRoutes[name]

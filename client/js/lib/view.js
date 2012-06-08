@@ -57,11 +57,11 @@ define(['jquery','external/require-backbone'],function($,Backbone){
       throw new Error("Tried to initialize view, but it is missing a router.")
     } else if(!this.initialized) {
       this.navigate = _.bind(function(page,replace,trigger){
-        // previously: page==this.router.history[this.router.history.length-1] && 
-        var refresh = (page == lastPage || (!window.location.hash && window.location.pathname == page))
-        lastPage = page
-        if(refresh){
-          console.log('navigate called but already on page',page)
+        var pathname = window.location.pathname,
+            hashpath = window.location.hash && window.location.hash.replace(/^#/,'/'),
+            refresh = hashpath ? page == hashpath : page == pathname
+        if(refresh && (replace !== true || replace.replace !== true)){
+          if(typeof console !== 'undefined') console.log('navigate called but already on page',page)
           // don't navigate to the exact same page twice.
           return false
         } else {
