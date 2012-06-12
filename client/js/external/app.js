@@ -29,7 +29,7 @@ define(
           } else {
             regex += match[2] ? "?" : "";
           }
-          regex += "([^\\/]+)" +(match[2]?"?":"");
+          regex += "([^\\/\?\&]+)" +(match[2]?"?":"");
           num++;
         }
         regex += "/";
