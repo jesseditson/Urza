@@ -4,7 +4,6 @@
   dir : "../../../../../public",
   optimize : "uglify",
   optimizeCss : "standard",
-  urlArgs : "bust=" +  (new Date()).getTime(),
   preserveLicenseComments: false,
   paths : {
     "jquery" : "../../node_modules/urza/client/js/external/require-jquery-min",
