@@ -1,0 +1,323 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Urza by jesseditson</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Urza</h1>
+        <p class="header">Urza is a node framework build for rapid and modular development.</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/jesseditson/Urza/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/jesseditson/Urza/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/jesseditson">jesseditson</a></p>
+
+
+      </header>
+      <section>
+        <h1>Urza</h1>
+
+<h4>Urza is a node.js framework for rapid, modular development.</h4>
+
+<p>Urza stands on the shoulders of giants, and tries to take as much of the early-stage development out of building a site as possible.</p>
+
+<p>I created Urza because I had a few too many projects, and wanted a unified framework to share between them. I wanted to be able to change out the underlying components, but access them in the same way. I wanted to be able to respond to a major pivot without losing much code. I wanted my client side code to be modular, and still be able to work with SEO, and I wanted to be able to spin up a new site without duplicating pieces of 10 other projects.</p>
+
+<p><strong>Note that Urza is still in [EXPERIMENTAL] mode, and only should be used by the daring. The API will change quite a bit before it is ready for production use - that said, it is used in active development of a few projects, and so should be relatively stable.</strong></p>
+
+<h1></h1>
+
+<h3>Basic usage of Urza:</h3>
+
+<p>To get things going quickly, Urza can create you a mostly client-side site very quickly. It will take care of the difficult stuff like gzipping, minification, and cluster when you put it in production mode. (more on that later.)</p>
+
+<p>To get started, install <a href="http://www.nodejs.org">node</a>, then install Urza via the wonderful <a href="http://npmjs.org">npm</a>:</p>
+
+<pre><code>npm install -g urza
+</code></pre>
+
+<p>You'll want this to be global, but Urza is both a local and a global dependency. The global dependency does all the scripty magic, the local one actually runs your site. Urza will list itself as a dependency for projects it creates, which is necessary. You'll want those sites to work on servers later.</p>
+
+<p>Next, create a site:</p>
+
+<pre><code>urza init myApp
+</code></pre>
+
+<p>This will create an Urza app called 'myApp' in the local directory.</p>
+
+<p>Urza will ask you a few things about the app you're creating, then create some basic structure for you to build with.</p>
+
+<p>To run your app, do this:</p>
+
+<pre><code>$ cd myApp
+$ node server.js
+</code></pre>
+
+<p>By default, Urza apps listen on port 8080. You can change this in the <code>config/default.json</code> file, or override it with a <code>config/runtime.json</code> file. If you haven't figured it out yet, Urza uses a module called <a href="https://github.com/lorenwest/node-config">node-config</a> to load it's config files, so you can do anything you can do with node-config files to the Urza ones. For instance, feel free to use YAML if json isn't your speed.</p>
+
+<h1></h1>
+
+<h3>Developing with Urza:</h3>
+
+<p>Once you have a boilerplate site up, you'll notice that the while the basics have been taken care of, you don't have much to look at yet.</p>
+
+<p>To get started creating an application, you'll want to be familiar with the basic paradigms Urza uses for the view and data layer.</p>
+
+<p>Here's the basics of an Urza application:</p>
+
+<h4>Data:</h4>
+
+<hr><p>There will be zero or more data types. These are basically Models, they have an underlying schema and database layer. The model is currently a Mongoose Schema, but will be refactored to support more data layers (specifically couchdb). I'm still deciding how much enforcement is necessary at this layer, so expect the schema spec to change.</p>
+
+<p>Each data type has a <strong>schema</strong>. This allows for typing stored data, and validation methods. Here is an example of a Schema:</p>
+
+<pre><code>var person = module.exports.Schema = new Schema({
+  name : { type : "String", default : ""},
+  pets : [String]
+});
+</code></pre>
+
+<p>Each schema has a <strong>provider</strong>. The provider exposes data-access methods. All providers inherit from a main provider, which provides common methods like <strong>all</strong>, <strong>create</strong>, or <strong>update</strong> full documentation of providers can be found here.</p>
+
+<p>Here is an example of a provider.</p>
+
+<pre><code>var Person = function(db){
+    this.db = db;
+}
+Person.prototype.randomPet = function(id,callback){
+    this.find({_id : id},{pets:1},function(err,person){
+        if(err || !person.pets.length){
+            callback(err);
+        } else {
+            var randomPet = person.pets[Math.floor(Math.random()*person.pets.length)];
+            callback(null,randomPet);
+        }
+    });
+}
+</code></pre>
+
+<p>Every time dynamic data is retreived from Urza, it is done via an api call.</p>
+
+<p>Urza's api is created by using objects, so there is a different endpoint for every action. Each endpoint can either be a deep object, or a function. If it is a function, it can be called with additional arguments by adding them between slashes. A 'default' method can be added to deep endpoints to allow it to be called without additional arguments.</p>
+
+<p>Here is an example to make that more clear:</p>
+
+<pre><code>var Person = module.exports = {
+    default : function(session,body,callback){
+        callback(null,"/api/person called.");
+    }
+    get : {
+        pets : function(session,body,callback,special){
+            if(special){
+                callback(null,"/api/person/get/pets/"+special+" called.");
+            } else {
+                callback(null,"/api/person/get/pets called.");
+            }
+        },
+        randomPet : function(session,body,callback,id){
+            if(!id){
+                callback(new Error("id not provided!"));
+            } else {
+                this.providers.person.randomPet(id,callback);
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>There are a few things not that the above example should make clear, but are worth going over:</p>
+
+<ul>
+<li><p>each method is passed the following arguments: <code>session</code>,<code>body</code>, and <code>callback</code>. The session is the current user session if it exists. The body is the body of a <code>post</code> if present. Callback will dispatch a json response to the request - if an error is returned, it will return the message of the error with a 503 header.</p></li>
+<li><p>objects can be arbitrarially deep, new endpoints will answer as deep as you want. You can also just tack on endpoints outside of the object literal using <code>Person.endpoint = function(){}</code> outside of the block. It's just a simple object. You can also add as many arguments as you want to any endpoint except the 'default' one.</p></li>
+<li><p>each api method is called in context of an internal api class, so you have access to <code>this.providers</code> - this allows you to look up info from any of your providers inside of these api calls.</p></li>
+</ul><h4>Views &amp; Partials:</h4>
+
+<hr><h5>Creating views:</h5>
+
+<p>All views in Urza are parsed on the server, and rendered on the client. This allows the use of DOM manipulation in views, but also maintains the speed of rendering on the server, and has long-term SEO implications (that have yet to be implemented).</p>
+
+<p>Each View usually has 2 files: a template file, and a js file. A js file is mandatory, but templates can be shared betweeen views, or js files could even just manipulate the DOM - however, this will break SEO, so definitely isn't recommended.</p>
+
+<p>All views are rendered via push state, so every Urza app is a single page app as far as the browser is concerned, although your apps may behave more like a multiple-page app.</p>
+
+<p>Out of the box, Urza supports multiple platforms. These are detected via the user agent, and allow you to create separate layouts for each platform. (Right now these platforms are just 'web' and 'mobile'. In the future this will be a configurable option.)</p>
+
+<p>When creating a view or partial, an html file will be added to each of these platform view folders. (<code>client/views/&lt;platform&gt;/&lt;viewname&gt;</code>.)</p>
+
+<p>To add a new view, just run:</p>
+
+<pre><code>urza create view &lt;viewname&gt;
+</code></pre>
+
+<p>This will generate a js file and an html file with the view name, along with adding a route for the view. You can now navigate to <code>http://yourapp.com/viewname"</code>.</p>
+
+<p>To create a more complicated route, you can create a view with name and a route:</p>
+
+<pre><code>urza create view --route "/:someparam/:paramname/*splat" &lt;viewname&gt;
+</code></pre>
+
+<p>This will expose the route: <code>http://yourapp.com/viewname/someparam/anotherparam/stuff/stuff/stuff</code>. These currently conform to backbone routes (but will probably use <a href="https://github.com/flatiron/director">director</a> routes in the future).</p>
+
+<p>To omit the html file and just set up the route, add the <code>--raw</code> flag (maybe needs to be renamed?)</p>
+
+<pre><code>urza create view --route ":option/:anotheroption --raw &lt;viewname&gt;
+</code></pre>
+
+<p>This will skip creating the blank html file.</p>
+
+<h5>Partial overview:</h5>
+
+<p>View partials are a way to load dynamic content without changing the history state. They also render on the server, using an api endpoint. You can augment the api data (if any) with an object should you choose.</p>
+
+<p>Partials are automatically detected by the view, so adding a partial to a view is as easy as adding an item with a <code>data-partial</code>  and a <code>data-url</code> attribute. Here is an example of a partial:</p>
+
+<pre><code>&lt;div id="myPartial" data-partial="mypartial" data-url="some/api/endpoint"&gt;
+  &lt;div class="loading"&gt;This content will be replaced when the partial loads.&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>If you want to inject data from the view to the partial, you can add an optional <code>data-obj</code> attribute to the partial:</p>
+
+<pre><code>&lt;div id="myPartial" data-partial="mypartial" data-url="some/api/endpoint" data-obj='{"something":"somevalue"}'&gt;&lt;/div&gt;
+</code></pre>
+
+<p>Creating partials is as simple as just adding the file to the <code>partials</code> folder inside the <code>views/&lt;platform&gt;</code> folders. However, to keep the workflow familiar, you can auto generate partials using:</p>
+
+<pre><code>urza create partial &lt;partialname&gt;
+</code></pre>
+
+<p>This will create a partial in both the <code>web</code> and <code>mobile</code> platform folders.</p>
+
+<h5>Data in views and partials:</h5>
+
+<p>In both views and partials, the object passed to the template will have a <code>data</code> key that contains the data passed. The main difference between views and partials is that a view is passed data by the router, whereas a partial is tied to an api endpoint (although you can pass it data using the <code>data-obj</code> attribute as well).</p>
+
+<h4>Client-Side Routing:</h4>
+
+<p>all routing is handled by the <code>client.js</code> file, located at: <code>client/js/client.js</code>.</p>
+
+<p>Routes are triggered via push state, and will (by default) call the route method when routed to.</p>
+
+<p>Each view will automatically answer to a route by calling it's own <code>show()</code> method. For instance, if we run <code>urza create view foo</code>, we can now navigate to <code>http://appurl/foo</code>, and the <code>foo.html</code> file will replace the content of the <code>#content</code> div. You don't have to add a route for this, but if you'd like to inject data or do other fancy stuff (conditional navigation, etc), you can add a route for your view.</p>
+
+<p><code>client.js</code> contains some boilerplate code that you can remove, and replace with your own routes. Views are available on the app.views object - using the above example again, you can add a route for <code>foo</code> by setting <code>app.views.foo.router</code> to a function - for instance:</p>
+
+<pre><code>app.views.foo.route = function(){
+  this.show({key:'value'});
+}
+</code></pre>
+
+<p>when in the function, <code>this</code> is the view, so you can call any of the view methods from there.</p>
+
+<p>After you have overridden any routes you'd like to use, you'll want to start the app to trigger the current route and listen for more routes.</p>
+
+<p>make sure that the last line in <code>client.js</code> is:</p>
+
+<pre><code>app.start();
+</code></pre>
+
+<h4>View Hooks &amp; Methods:</h4>
+
+<p>All views expose various methods for interacting or responding to them - here's an overview:</p>
+
+<ul>
+<li>
+<code>view.render(&lt;function&gt;)</code>:
+
+<ul>
+<li>Pass this method a function to trigger when a view has started to draw. All elements in the view template will be available on the DOM, but partials are not available yet.</li>
+</ul>
+</li>
+<li>
+<code>view.postRender(&lt;function&gt;)</code>:
+
+<ul>
+<li>The passed function is triggered after the view has completely finished rendering - you can access partials and stuff here.</li>
+</ul>
+</li>
+<li>
+<code>view.get(&lt;keyname&gt;) and view.set(&lt;keyname&gt;,&lt;value&gt;)</code>
+
+<ul>
+<li>arbitrary key/value store on the view. Good for passing data around on views. Note that the main use for this is to access the <code>data</code> key passed when data is set on a view. For instance - if you call <code>view.show({foo:'bar'})</code>, you can then access the foo key using <code>view.get('data').foo</code>
+</li>
+</ul>
+</li>
+<li>
+<code>view.on(&lt;eventString&gt;,&lt;function&gt;)</code>
+
+<ul>
+<li>this is basically a wrapper for backbone's <code>on</code> method - this will allow you to bind events to the view. Not sure if this is staying in long-term.</li>
+</ul>
+</li>
+<li>
+<code>view.transitionIn and view.transitionOut</code>
+
+<ul>
+<li>these methods can be overriden to add transitions to views. They must be overriden with a single argument of <code>callback</code>, which must be called in order for the view to continue rendering.</li>
+</ul>
+</li>
+<li>
+<code>view.showLoading and view.hideLoading</code>
+
+<ul>
+<li>these methods can be overriden to add a loading screen between pages.</li>
+</ul>
+</li>
+<li>
+<code>view.remove()</code>
+
+<ul>
+<li>this will entirely remove the view and it's events from the DOM.</li>
+</ul>
+</li>
+<li>
+<code>view.renderPartial(&lt;partialname&gt;,&lt;callback&gt;)</code>
+
+<ul>
+<li>this will re-render a partial (called by name), and optionally call back when the render is complete. It will request the same api endpoint it was set up with and re-draw the partial.</li>
+</ul>
+</li>
+<li>
+<code>view.show(&lt;data&gt;)</code>
+
+<ul>
+<li>this will begin the cycle of drawing the view. You may optionally pass in data for the view to render.</li>
+</ul>
+</li>
+</ul>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-32553774-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
