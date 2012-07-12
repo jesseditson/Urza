@@ -506,17 +506,21 @@ if(require.main === module) {
   // configures the templating engine we want to work with.
   // TODO: may need larger abstraction of view logic.
   UrzaServer.prototype.configureTemplates = function(app){
-    switch(this.options.templates && this.options.templates.engine){
-      case 'handlebars' :
-        // set up view engine
-        app.set('view engine','html');
-      	app.set('views',process.cwd()+ '/client/views');
-      	app.register('html',expressHandlebars);
-        this.templatingEngine = expressHandlebars;
-        break;
-      default :
-        throw new Error('Unknown templating engine specified: "'+this.options.templates.engine+'"');
-        break;
+    if(this.options && this.options.templates && this.options.templates.engine){
+      switch(this.options.templates.engine){
+        case 'handlebars' :
+          // set up view engine
+          app.set('view engine','html');
+        	app.set('views',process.cwd()+ '/client/views');
+        	app.register('html',expressHandlebars);
+          this.templatingEngine = expressHandlebars;
+          break;
+        default :
+          throw new Error('Unknown templating engine specified: "'+this.options.templates.engine+'"');
+          break;
+      }
+    } else {
+      console.warn('No templating engine specified. No view engine will be used.')
     }
     return app;
   }
