@@ -446,12 +446,6 @@ if(require.main === module) {
       // basic express stuff
     	app.use(express.bodyParser());
     	app.use(express.cookieParser());
-      // TODO: add persistent sessions.
-      if(this.options.sessionHandler){
-        app.use(express.session(this.options.sessionHandler));
-      } else {
-        app.use(express.session({ secret: "aging daddies" }));
-      }
       // templates
       this.configureTemplates(app);
       // middleware
@@ -459,7 +453,11 @@ if(require.main === module) {
       var oneYear = 31557600000;
       app.use(gzippo.staticGzip('./' + this.publicDir,{ maxAge: oneYear }));
       app.use(gzippo.staticGzip(__dirname + '/client',{ maxAge: oneYear }));
-      app.use(gzippo.compress());
+      if(this.options.sessionHandler){
+        app.use(express.session(this.options.sessionHandler));
+      } else {
+        app.use(express.session({ secret: "aging daddies" }));
+      }
       // if authenticate is specified, use the path specified as the authenticate middleware.
       if(this.options.authenticate){
         app.use(require(process.cwd() + '/' + this.options.authenticate).bind(this));
@@ -467,6 +465,7 @@ if(require.main === module) {
     	app.use(useragent);
     	app.use(render);
     	app.use(reqLogger.create(logger));
+      app.use(gzippo.compress());
     }.bind(this));
     // set up development only configurations
     app.configure('development', function(){
