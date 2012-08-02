@@ -200,6 +200,13 @@ define(['jquery','external/require-backbone'],function($,Backbone){
       el = null;
       data = {};
     }
+    // add partial to view
+    this.view.partials[partial] = {
+      name : partial,
+      url : api,
+      obj : data,
+      el : el
+    }
     render.call(this,partial,api,data,el,callback);
   }
   // remove the whole view.
