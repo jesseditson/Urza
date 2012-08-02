@@ -353,7 +353,7 @@ if(require.main === module) {
   // Dependencies
   // ------------
 
-  var express = require('express'),
+  var express = module.exports.express = require('express'),
       fs = require('fs'),
       cluster = require('cluster'),
       _ = require('underscore'),
