@@ -1,8 +1,15 @@
 /*global module:false*/
 module.exports = function(grunt) {
-
+  var helpers = require('./cli/helpers')
+  
+  // set working dir to closest .urza dir
+  var workingDir = helpers.getAppRoot()
+  
+  // load up require plugin
+  grunt.loadNpmTasks('grunt-requirejs');
+  
   // Project configuration.
-  grunt.initConfig({
+  var gruntConfig = {
     pkg: '<json:package.json>',
     meta: {
       banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
@@ -15,27 +22,9 @@ module.exports = function(grunt) {
       lib: ['*.js','lib/**/*.js','test/**/*.js'],
       client : ['client/js/external/app.js','client/js/lib/**/*.js']
     },
-    qunit: {
-      files: ['test/**/*.html']
-    },
-    concat: {
-      dist: {
-        src: ['<banner:meta.banner>', '<file_strip_banner:lib/<%= pkg.name %>.js>'],
-        dest: 'dist/<%= pkg.name %>.js'
-      }
-    },
-    min: {
-      dist: {
-        src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest: 'dist/<%= pkg.name %>.min.js'
-      }
-    },
-    watch: {
-      files: '<config:lint.files>',
-      tasks: 'lint qunit'
-    },
     jshint: {
       options: {
+        // Note: these appear to be completely overridden, not overloaded.
         curly: false,
         eqeqeq: false,
         forin: false,
@@ -72,10 +61,32 @@ module.exports = function(grunt) {
         }
       }
     },
-    uglify: {}
-  });
+    requirejs : {
+      // TODO: link up lib/views to generated view file.
+      appDir : workingDir + "/client",
+      baseUrl : "js",
+      dir : workingDir + "/public",
+      optimize : "uglify",
+      preserveLicenseComments: false,
+      paths : {
+        "jquery" : workingDir + "/node_modules/urza/client/js/vendor/require-jquery-min",
+        "external/app" : workingDir + "/node_modules/urza/client/js/external/app",
+        "lib/router" : workingDir + "/node_modules/urza/client/js/lib/router",
+        "lib/view" : workingDir + "/node_modules/urza/client/js/lib/view",
+        "vendor/require-backbone" : workingDir + "/node_modules/urza/client/js/vendor/require-backbone"
+      },
+      modules : [
+        {
+          name : "client",
+          exclude: ['jquery']
+        }
+      ]
+    }
+  }
+  
+  grunt.initConfig(gruntConfig);
 
   // Default task.
-  grunt.registerTask('default', 'lint qunit concat min');
-
+  grunt.registerTask('default', 'lint');
+  grunt.registerTask('build', 'lint requirejs')
 };
