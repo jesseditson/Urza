@@ -32,7 +32,7 @@ if(require.main === module) {
       getAppRoot = function(dir){
         if(appRoot) return appRoot;
         // looks up the directory tree until it finds a folder with a .urza file.
-        var dir = dir ? dir.replace(/\/[^\/]+$/,'') : process.cwd();
+        dir = dir ? dir.replace(/\/[^\/]+$/,'') : process.cwd();
         if(!dir.length){
           console.error('Urza app not found. Please run from inside an Urza app.');
           process.exit(1);
@@ -115,7 +115,6 @@ if(require.main === module) {
           mkdirp(appdir,function(err){
             if(err){
               throw err;
-              process.exit(1)
             } else {
               wrench.copyDirSyncRecursive(__dirname + '/example',appdir);
               console.log('created directory tree.');
@@ -150,7 +149,7 @@ if(require.main === module) {
   var appViewFolder = '/client/js/lib/views/',
       appHtmlFolders = ['/client/views/mobile/','/client/views/web/'],
       appViewFile = '/client/js/lib/views.js',
-      requireViewPath = 'lib/views/';
+      requireViewPath = 'lib/views/',
       updateViews = function(viewRoutes,raw){
         var root = getAppRoot(),
             appFile = root + appViewFile,
@@ -168,7 +167,7 @@ if(require.main === module) {
             process.exit(1);
           }
           var viewObject = parseJSON(viewObjectMatches[1]),
-              viewArray = parseJSON((viewArrayMatches && viewArrayMatches[1]) || '[]');
+              viewArray = parseJSON((viewArrayMatches && viewArrayMatches[1]) || '[]'),
               viewHtmlTemplate = fs.readFileSync(__dirname + '/templates/view.html','utf8'),
               viewTemplate = fs.readFileSync(__dirname + '/templates/view.js','utf8');
           // loop through the views in viewRoutes
@@ -397,19 +396,12 @@ if(require.main === module) {
   UrzaServer.prototype.start = function(){
     if (this.options.environment=="production") {
       var numCpus = require('os').cpus().length;
-    	// in production, set up cluster
-    	if (cluster.isMaster) {
-    		if (this.options.maxCpus){
-    			var numberOfWorkers = this.options.maxCpus;
-    		} else {
-    			if (numCpus>1) {
-    				var numberOfWorkers = numCpus;
-    			} else {
-    				var numberOfWorkers = 2;
-    			};
-    		}
+      // in production, set up cluster
+      if (cluster.isMaster) {
+        var numberOfWorkers = numCpus>1 ? numCpus : 2;
+        if (!this.options.maxCpus) numberOfWorkers = this.options.maxCpus;
         var forkWorker = function(){
-    			var worker = cluster.fork();
+          var worker = cluster.fork();
           this.workers.push(worker);
           // allow communication to this worker
           worker.on('message',function(worker,message){
@@ -420,21 +412,21 @@ if(require.main === module) {
             }
           }.bind(this,worker))
         }.bind(this)
-    		for(var i=0; i< numberOfWorkers; i++) {
-    			forkWorker()
-    		}
-    	 	cluster.on('death', function(worker) {
-    			forkWorker()
-  	  	});
-    	} else {
-    		this.app.listen(this.options.serverPort);
-    		logger.debug("Urza server master started listening on port: " + this.options.serverPort)
-    	};	
+        for(var i=0; i< numberOfWorkers; i++) {
+          forkWorker()
+        }
+         cluster.on('death', function(worker) {
+          forkWorker()
+        });
+      } else {
+        this.app.listen(this.options.serverPort);
+        logger.debug("Urza server master started listening on port: " + this.options.serverPort)
+      }
     } else {
-    	// in development, just run as an express instance.
-    	this.app.listen(this.options.serverPort);
-    	logger.debug("Urza server started as single process listening on port: " + this.options.serverPort)	
-    };
+      // in development, just run as an express instance.
+      this.app.listen(this.options.serverPort);
+      logger.debug("Urza server started as single process listening on port: " + this.options.serverPort)  
+    }
   }
 
   // **Create App**
@@ -444,12 +436,12 @@ if(require.main === module) {
     // **Express app configuration**
     app.configure(function(){
       // basic express stuff
-    	app.use(express.bodyParser());
-    	app.use(express.cookieParser());
+      app.use(express.bodyParser());
+      app.use(express.cookieParser());
       // templates
       this.configureTemplates(app);
       // middleware
-    	app.use(express.methodOverride());
+      app.use(express.methodOverride());
       var oneYear = 31557600000;
       app.use(gzippo.staticGzip('./' + this.publicDir,{ maxAge: oneYear }));
       app.use(gzippo.staticGzip(__dirname + '/client',{ maxAge: oneYear }));
@@ -462,20 +454,20 @@ if(require.main === module) {
       if(this.options.authenticate){
         app.use(require(process.cwd() + '/' + this.options.authenticate).bind(this));
       }
-    	app.use(useragent);
-    	app.use(render);
-    	app.use(reqLogger.create(logger));
+      app.use(useragent);
+      app.use(render);
+      app.use(reqLogger.create(logger));
       app.use(gzippo.compress());
     }.bind(this));
     // set up development only configurations
     app.configure('development', function(){
-    	// Be as loud as possible during development errors
-     	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+      // Be as loud as possible during development errors
+       app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
     });
     // set up production only configurations
     app.configure('production', function(){
-    	// Be as quiet as possible during production errors
-     	app.use(express.errorHandler()); 
+      // Be as quiet as possible during production errors
+       app.use(express.errorHandler()); 
     });
     // add dynamic helpers
     this.configureHelpers(app);
@@ -510,13 +502,12 @@ if(require.main === module) {
         case 'handlebars' :
           // set up view engine
           app.set('view engine','html');
-        	app.set('views',process.cwd()+ '/client/views');
-        	app.register('html',expressHandlebars);
+          app.set('views',process.cwd()+ '/client/views');
+          app.register('html',expressHandlebars);
           this.templatingEngine = expressHandlebars;
           break;
         default :
           throw new Error('Unknown templating engine specified: "'+this.options.templates.engine+'"');
-          break;
       }
     } else {
       console.warn('No templating engine specified. No view engine will be used.')
@@ -527,7 +518,7 @@ if(require.main === module) {
   // **Call Api Method**
   // directly call the api
   UrzaServer.prototype.callApi = function(params,session,body,callback){
-    var params = params[0] ? params[0].split('/') : [];
+    params = params[0] ? params[0].split('/') : [];
     this.api.route(params,session,body,callback);
   }
 
@@ -580,7 +571,7 @@ if(require.main === module) {
     // **Main App Route**
     app.all("/*",function(req,res,next){
       if(this['default']){
-        this.default.call(app,req,res,next);
+        this['default'].call(app,req,res,next);
       } else {
         var params = req.prams && req.params.split('/');
         res.render('main');

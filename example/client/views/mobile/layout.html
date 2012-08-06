@@ -1,31 +1,31 @@
 <!doctype html>
 <!--[if lt IE 9]><html class="ie"><![endif]-->
 <!--[if gte IE 9]><!--><html><!--<![endif]-->
-	<head>
-		<meta charset="utf-8"/>
-		<title>[[APPNAME]]</title>
-		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-		<link rel="stylesheet" media="all" href="/css/main.css"/>
+  <head>
+    <meta charset="utf-8"/>
+    <title>[[APPNAME]]</title>
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" media="all" href="/css/main.css"/>
     <!-- component css -->
     {{#each componentcss}}
     <link rel="stylesheet" media="all" href="/css/components/{{this}}"/>
     {{/each}}
 
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <script src="/js/external/underscore.js"></script>
     <script data-main="/js/client" src="/js/external/require-jquery.js"></script>
-	</head>
-	<body lang="en">
+  </head>
+  <body lang="en">
     <header>
       <h1>[[APPNAME]]</h1>
     </header>
-		<article>
-		  <div id="content">
+    <article>
+      <div id="content">
         {{{body}}}
       </div>
-		</article>
-	</body>
+    </article>
+  </body>
 </html>

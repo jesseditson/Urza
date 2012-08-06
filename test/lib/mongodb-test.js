@@ -1,12 +1,12 @@
 
 // set up config dir so tests will use the config fixture.
-process.env['NODE_CONFIG_DIR'] = __dirname + '/../fixtures/config';
+process.env.NODE_CONFIG_DIR = __dirname + '/../fixtures/config';
 
 // Dependencies
 // ------------
 
 var path = require('path'),
-  	exec = require('child_process').exec,
+    exec = require('child_process').exec,
     vows = require('vows'),
     config = require('config'),
     assert = require('assert'),
@@ -29,11 +29,11 @@ vows.describe('MongoDB Module').addBatch({
       }.bind(this));
     },
     'autoloads schemas from the fixtures path' : function(mongo){
-      assert(mongo.models['User']);
-      assert.equal(mongo.collections['users'],'User');
+      assert(mongo.models.User);
+      assert.equal(mongo.collections.users,'User');
     },
     'decorates loaded models with findAndModify' : function(mongo){
-      assert.equal(typeof mongo.models[mongo.collections['users']].findAndModify,'function');
+      assert.equal(typeof mongo.models[mongo.collections.users].findAndModify,'function');
     },
     'when trying to get a user by Quinn Wilhelmi Reilly\'s ID' : {
       topic:function(mongo){
@@ -177,4 +177,4 @@ vows.describe('MongoDB Module').addBatch({
       'the user was created and valid' : helpers.assertions.user
     }
   }
-}).export(module);
+})['export'](module);

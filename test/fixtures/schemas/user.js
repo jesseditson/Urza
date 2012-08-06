@@ -22,7 +22,7 @@ var mapReduce = module.exports.mapReduce = {
     },
     "reduce" : function(prev,current){
       var count = 0;
-      for(index in current) {
+      for(var index in current) {
         count += current[index];
       }
       return count;
@@ -49,11 +49,11 @@ var Fields = module.exports.Fields = {
   "offers" : [ { type : String } ],
   "campaigns" : [ { type : String } ],
   "id" : {type : String, index : true},
-  "signed_up" : { type : Boolean, default : false },
+  "signed_up" : { type : Boolean, 'default' : false },
   "about" : String,
   "bio" : String,
   "birthday" : String,
-  "created_at" : { type : Date, default : Date.now },
+  "created_at" : { type : Date, 'default' : Date.now },
   "email" : String,
   "first_name" : String,
   "middle_name" : String,
@@ -64,7 +64,7 @@ var Fields = module.exports.Fields = {
     "id" : String,
     "name" : String
   },
-  "last_login" : { type : Date, default : Date.now },
+  "last_login" : { type : Date, 'default' : Date.now },
   "link" : String,
   "locale" : String,
   "location" : {
@@ -76,8 +76,8 @@ var Fields = module.exports.Fields = {
   "quotes" : String,
   "religion" : String,
   "timezone" : Number,
-  "updated_time" : { type : Date, default : Date.now },
-  "updating" : { type : Boolean, default : false },
+  "updated_time" : { type : Date, 'default' : Date.now },
+  "updating" : { type : Boolean, 'default' : false },
   "username" : String,
   "verified" : Boolean,
   "work" : [

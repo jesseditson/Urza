@@ -2,7 +2,7 @@
 // ------------
 
 // set up config dir so tests will use the config fixture.
-process.env['NODE_CONFIG_DIR'] = __dirname + '/../fixtures/config';
+process.env.NODE_CONFIG_DIR = __dirname + '/../fixtures/config';
 
 var vows = require('vows'),
     assert = require('assert'),
@@ -57,4 +57,4 @@ vows.describe('Api Module').addBatch({
       }
     }
   }
-}).export(module);
+})['export'](module);

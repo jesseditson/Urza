@@ -180,7 +180,7 @@ define(['jquery','external/require-backbone'],function($,Backbone){
         this.set("data",data);
         // finally, render the view
         view.render(data);
-        if(partials.length==0){
+        if(partials.length===0){
           done();
         }
       },this)

@@ -2,10 +2,10 @@
 // ------------
 
 // set up config dir so tests will use the config fixture.
-process.env['NODE_CONFIG_DIR'] = __dirname + '/../fixtures/config';
+process.env.NODE_CONFIG_DIR = __dirname + '/../fixtures/config';
 
 var vows = require('vows'),
-  	exec = require('child_process').exec,
+    exec = require('child_process').exec,
     assert = require('assert'),
     Providers = require('../../lib/providers.js');
 
@@ -107,4 +107,4 @@ vows.describe('Providers Module').addBatch({
       }
     }
   }
-}).export(module);
+})['export'](module);

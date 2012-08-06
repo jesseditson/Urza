@@ -15,7 +15,6 @@ define(
           viewNameMatches = viewPath.match(/\/([^\/]+)(\.js)?$/);
       if(!viewNameMatches || !viewNameMatches[1]){
         throw new Error('view name for view '+viewPath+' is malformed. Failed to load views.');
-        return;
       }
       viewName = viewNameMatches[1];
       route = viewObject[viewPath];
@@ -29,7 +28,8 @@ define(
           } else {
             regex += match[2] ? "?" : "";
           }
-          regex += "([^\\/\?\&]+)" +(match[2]?"?":"");
+          // NOTE: lint compains when ? and & are escaped, verify that it's not actually necessary
+          regex += "([^\\/?&]+)" +(match[2]?"?":"");
           num++;
         }
         regex += "/";
@@ -38,7 +38,7 @@ define(
       // detect if this route a regex (just checks for slashes right now)
       if(route.match(/^\/(.+?[^\\]\/)+\w*$/)){
         // convert to regexp object
-        var pattern = route.replace(/^\/(.+?)\/\w*$/,"$1").replace(/(\\)/,"\$1"),
+        var pattern = route.replace(/^\/(.+?)\/\w*$/,"$1").replace(/(\\)/,"$1"),
             flags = route.replace(/^\/.+?\/(\w*)$/,"$1");
         route = new RegExp(viewName + '/' +pattern,flags);
       } else if(!~_.indexOf(raw,viewName)) {

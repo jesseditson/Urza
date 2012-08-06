@@ -8,7 +8,6 @@ define(['external/require-backbone'],function(Backbone){
     this.router = new router();
     this.history = [];
     this.lastpage = "";
-    this.onLeave;
   };
   // Override the Backbone loadUrl method to allow us to respond to ALL hashchange events.
   var backboneLoadUrl = Backbone.History.prototype.loadUrl;

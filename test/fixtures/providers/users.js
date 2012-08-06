@@ -51,11 +51,11 @@ Users.prototype.create = function(data,callback){
 // --------------
 
 Users.prototype.refresh = function(user,callback){
-	if(user._id){
-		this.db.findById('users',user._id,callback);
-	} else {
-		callback(null,user);
-	}
+  if(user._id){
+    this.db.findById('users',user._id,callback);
+  } else {
+    callback(null,user);
+  }
 };
 
 Users.prototype.updateAndReturn = function(id,data,callback){
