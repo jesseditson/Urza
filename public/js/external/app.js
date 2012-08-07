@@ -1,5 +1,5 @@
 define(
-  ['lib/router','lib/views'],
+  ['lib/router','lib/viewRoutes'],
   function(Router,viewInfo){
     var viewsArray = Array.prototype.slice.call(viewInfo.views),
         viewObject = viewInfo.routes,
