@@ -1,11 +1,42 @@
 /*global module:false*/
 module.exports = function(grunt) {
   // deps 
-  var helpers = require('./cli/helpers')
+  var helpers = require('./cli/helpers'),
+      fs = require('fs'),
+      path = require('path'),
+      wrench = require('wrench'),
+      async = require('async'),
+      getViews = require('./lib/helpers/middleware/views.js').getViews
   
   // set working dir to closest .urza dir
   var workingDir = helpers.getAppRoot()
   var scratchDir = workingDir + '/__urza_scratch'
+  
+  // set up grunt task to create scratch dir
+  grunt.registerTask('generateViewFiles','generates scratch dir and puts views in them.',function(){
+    var done = this.async();
+    if((fs.existsSync || path.existsSync)(scratchDir)){
+      console.log('Removing previous scratch dir')
+      wrench.rmdirSyncRecursive(scratchDir)
+    }
+    
+    // make a scratch directory
+    console.log('creating scratch dir')
+    fs.mkdirSync(scratchDir)
+    
+    // export new views.js files for each of our build scripts
+    console.log('generating temp views.js files')
+    async.forEach(['web','mobile'],function(type,done){
+      getViews(type,function(err,str){
+        fs.writeFile(scratchDir + '/views_'+type+'.js',str,'utf8',done)
+      })
+    },done)
+  })
+  // set up grunt task to delete temp dir
+  grunt.registerTask('removeScratchDir','Removes the urza scratch dir',function(){
+    console.log('Removing previous scratch dir')
+    wrench.rmdirSyncRecursive(scratchDir)
+  })
   
   // load up require plugin
   grunt.loadNpmTasks('grunt-requirejs');
@@ -13,7 +44,6 @@ module.exports = function(grunt) {
   // Set up require conf
   var requireConfigs = {
     web : {
-      // TODO: link up lib/views to generated view file.
       appDir : workingDir + "/client",
       baseUrl : "js",
       dir : workingDir + "/public_web",
@@ -51,8 +81,12 @@ module.exports = function(grunt) {
         ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
     },
     lint: {
-      lib: ['*.js','lib/**/*.js','test/**/*.js'],
-      client : ['client/js/external/app.js','client/js/lib/**/*.js']
+      // Note: may not want these to run during client builds.
+      urza_lib: ['*.js','lib/**/*.js','test/**/*.js'],
+      urza_client : ['client/js/external/app.js','client/js/lib/**/*.js'],
+      // client lint
+      lib : [workingDir+'/*.js',workingDir+'/lib/**/*.js'],
+      client : [workingDir+'/client/js/**/*.js']
     },
     jshint: {
       options: {
@@ -75,6 +109,22 @@ module.exports = function(grunt) {
       },
       globals: {
         emit : true
+      },
+      urza_lib : {
+        options : {
+          onecase : true,
+          asi: true,
+          loopfunc: true,
+          node:true
+        }
+      },
+      urza_client : {
+        options : {
+          asi:true,
+          loopfunc: true,
+          boss: true,
+          browser:true
+        }
       },
       lib : {
         options : {
@@ -105,5 +155,5 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'lint');
-  grunt.registerTask('build', 'lint requirejs:web requirejs:mobile')
+  grunt.registerTask('build', 'lint generateViewFiles requirejs:web requirejs:mobile removeScratchDir')
 };

@@ -57,7 +57,8 @@ if(require.main === module) {
       cluster = require('cluster'),
       _ = require('underscore'),
       path = require('path'),
-      gzippo = require('gzippo');
+      gzippo = require('gzippo'),
+      async = require('async')
 
   // Module Dependencies
   // -------------------
@@ -68,12 +69,13 @@ if(require.main === module) {
       useragent = require('./lib/helpers/middleware/useragent.js'),
       render = require('./lib/helpers/middleware/render.js'),
       viewsMiddleware = require('./lib/helpers/middleware/views.js').middleware,
+      helpers = require('./cli/helpers.js'),
       Api = require('./lib/api.js');
   // Urza App Class
   // --------------
   var UrzaServer = module.exports.Server = function(options){
     this.options = options;
-    this.publicDir = this.options.environment == "development" ? "client" : "public";
+    this.environment = this.options.environment;
     this.api = new Api();
     this.app = this.createApp();
     this.cluster = cluster;
@@ -100,7 +102,7 @@ if(require.main === module) {
       // in production, set up cluster
       if (cluster.isMaster) {
         var numberOfWorkers = numCpus>1 ? numCpus : 2;
-        if (!this.options.maxCpus) numberOfWorkers = this.options.maxCpus;
+        if (this.options.maxCpus) numberOfWorkers = this.options.maxCpus;
         var forkWorker = function(){
           var worker = cluster.fork();
           this.workers.push(worker);
@@ -108,7 +110,7 @@ if(require.main === module) {
           worker.on('message',function(worker,message){
             if(this.workerMethods[message.method]){
               this.workerMethods[message.method].call(this,message.data)
-            } else {
+            } else if(message.method){
               logger.silly('worker tried to call method ' + message.method + ', but it does not exist. Data: ',message.data)
             }
           }.bind(this,worker))
@@ -133,7 +135,20 @@ if(require.main === module) {
   // **Create App**
   // creates and configures an express app.
   UrzaServer.prototype.createApp = function(){
-    var app = express.createServer();
+    var app = express.createServer(),
+        workingDir = helpers.getAppRoot()
+    if(this.environment === 'production'){
+      var clientFiles = { web : "", mobile : "", ready : false, readyCallbacks : [] }
+      async.map(['web','mobile'],function(type,done){
+        fs.readFile(workingDir + '/public_' + type + '/js/client.js','utf8',done)
+      },function(err,clients){
+        if(err) throw(err)
+        clientFiles.web = clients[0]
+        clientFiles.mobile = clients[1]
+        clientFiles.ready = true
+        clientFiles.readyCallbacks.forEach(function(cb){ cb() })
+      })
+    }
     // **Express app configuration**
     app.configure(function(){
       // basic express stuff
@@ -147,9 +162,27 @@ if(require.main === module) {
       app.use(useragent);
       // views.js - always compiled at runtime.
       app.use(viewsMiddleware);
+      if(this.environment === 'production'){
+        // serve prod client.js based on user agent
+        var getClient = function(req,res,next){
+          // only respond to requests for client.js
+          if(!req.url.match(/^\/js\/client\.js/)) return next()
+          // wait until we're ready
+          if(!clientFiles.ready) return clientFiles.readyCallbacks.push(getClient.bind(this,req,res,next))
+          res.send(req.isMobile ? clientFiles.mobile : clientFiles.web)
+        }
+        app.use(getClient)
+      }
       // static files
       var oneYear = 31557600000;
-      app.use(gzippo.staticGzip('./' + this.publicDir,{ maxAge: oneYear }));
+      if(this.environment == 'development'){
+        app.use(gzippo.staticGzip(workingDir + '/client',{ maxAge: oneYear }));
+      } else {
+        // use web for any prod static files (unlikely case, but they're all the same except client and views anyway.
+        // these files should be coming from a cdn.
+        app.use(gzippo.staticGzip(workingDir + '/public_web',{ maxAge: oneYear }));
+      }
+      // serve urza's client dir too
       app.use(gzippo.staticGzip(__dirname + '/client',{ maxAge: oneYear }));
       if(this.options.sessionHandler){
         app.use(express.session(this.options.sessionHandler));
