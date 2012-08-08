@@ -100,7 +100,6 @@ if(require.main === module) {
     if(!this.options.cdn || !this.options.cdn.hosts || !this.options.cdn.hosts.length) return ''
     if(!this.cdnHosts){
       var hosts = this.options.cdn.hosts,
-          clientVersion = this.options.clientVersion || "unknown",
           hostsObject = {}
       hosts.forEach(function(h){
         hostsObject[h] = 0
@@ -112,7 +111,9 @@ if(require.main === module) {
           return cdnHosts[a] - cdnHosts[b]
         })[0]
     cdnHosts[cdnPath] ++
-    if(process.env.NODE_ENV == 'production') cdnPath += '/' + clientVersion
+    if(process.env.NODE_ENV == 'production'){
+      cdnPath += '/' + this.options.clientVersion || "unknown"
+    }
     return cdnPath.replace(/\/$/,'')
   }
 
