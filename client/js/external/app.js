@@ -27,7 +27,7 @@ define(
             regex += match[2] ? "?" : "";
           }
           // NOTE: lint compains when ? and & are escaped, verify that it's not actually necessary
-          regex += "([^\\/?&]+)" +(match[2]?"?":"");
+          regex += "([^\\/\\?&]+)" +(match[2]?"?":"");
           num++;
         }
         regex += "/";
