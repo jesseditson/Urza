@@ -93,6 +93,28 @@ if(require.main === module) {
       this[method] = this.app[method].bind(this.app);
     }.bind(this));
   }
+  
+  // **get Cdn Path
+  // called each time we request the cdn, stores and shards endpoints
+  UrzaServer.prototype.cdnUrl = function(){
+    if(!this.options.cdn || !this.options.cdn.hosts || !this.options.cdn.hosts.length) return ''
+    if(!this.cdnHosts){
+      var hosts = this.options.cdn.hosts,
+          clientVersion = this.options.clientVersion || "unknown",
+          hostsObject = {}
+      hosts.forEach(function(h){
+        hostsObject[h] = 0
+      })
+      this.cdnHosts = hostsObject
+    }
+    var cdnHosts = this.cdnHosts,
+        cdnPath = Object.keys(cdnHosts).sort(function(a,b){
+          return cdnHosts[a] - cdnHosts[b]
+        })[0]
+    cdnHosts[cdnPath] ++
+    if(process.env.NODE_ENV == 'production') cdnPath += '/' + clientVersion
+    return cdnPath.replace(/\/$/,'')
+  }
 
   // **Start Server**
   // starts up the app
@@ -205,8 +227,9 @@ if(require.main === module) {
     // set up production only configurations
     app.configure('production', function(){
       // Be as quiet as possible during production errors
-       app.use(express.errorHandler()); 
-    });
+       app.use(express.errorHandler());
+       app.set('views',this.cdnUrl())
+    }.bind(this));
     // add dynamic helpers
     this.configureHelpers(app);
     // return the ready to .listen() app.
@@ -216,16 +239,36 @@ if(require.main === module) {
   // **Set up dynamic helpers**
   // makes some assumptions about helpers...
   UrzaServer.prototype.configureHelpers = function(app){
+    var cdnUrl = this.cdnUrl.bind(this)
     // set up dynamic helpers - these will be available in the layout scope when pages are rendered.
     var cssCache,
-        componentPath = process.cwd() + '/client/css/components';
+        buildTime = new Date().getTime(),
+        componentPath = process.cwd() + '/client/css/components',
+        buster = (this.options.environment == 'production' ? this.options.clientVersion : buildTime)
     app.dynamicHelpers({
       user : function(req,res){
         return req.session && req.session.user;
       },
       componentcss : function(req,res){
-        if(!cssCache) cssCache = (path.existsSync(componentPath)) ? fs.readdirSync(componentPath) : [];
+        if(!cssCache){
+          cssCache = (path.existsSync(componentPath) ? fs.readdirSync(componentPath) : []).map(function(f){
+            var cdn = cdnUrl()
+            return (cdn ? cdn : '') + '/css/components/' + f + '?b=' + buster
+          })
+        }
         return cssCache;
+      },
+      buildTime : function(req,res){
+        return buster;
+      },
+      cdn : function(req,res){
+        return cdnUrl()
+      },
+      clientJs : function(req,res){
+        var cdn = cdnUrl()
+        if(!cdn) return 'client'
+        if(req.isMobile) return 'client_mobile'
+        return 'client_web'
       }
     });
     return app;

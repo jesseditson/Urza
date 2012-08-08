@@ -11,6 +11,10 @@ module.exports = function(grunt) {
   // set working dir to closest .urza dir
   var workingDir = helpers.getAppRoot()
   var scratchDir = workingDir + '/__urza_scratch'
+  // set up config dir so grunt will use the config client config.
+  process.env.NODE_CONFIG_DIR = workingDir + '/config';
+  var config = require('config')
+  var packageInfo = JSON.parse(fs.readFileSync(workingDir + '/package.json','utf8'))
   
   // set up grunt task to create scratch dir
   grunt.registerTask('generateViewFiles','generates scratch dir and puts views in them.',function(){
@@ -33,9 +37,44 @@ module.exports = function(grunt) {
     },done)
   })
   // set up grunt task to delete temp dir
-  grunt.registerTask('removeScratchDir','Removes the urza scratch dir',function(){
-    console.log('Removing previous scratch dir')
+  grunt.registerTask('cleanup','Removes the urza scratch dir',function(){
+    console.log('Cleaning up...')
     wrench.rmdirSyncRecursive(scratchDir)
+    wrench.rmdirSyncRecursive(workingDir + '/public')
+    wrench.rmdirSyncRecursive(workingDir + '/public_web')
+    wrench.rmdirSyncRecursive(workingDir + '/public_mobile')
+  })
+  // set up grunt task to upload to s3
+  grunt.registerTask('uploadToS3','uploads built public_web dir to S3',function(){
+    console.log('uploading public dir to S3')
+    if(!config.aws){
+      throw new Error("You must specify a 'config.aws' object with keys: 'awsPrivateKey', 'awsKey', 'staticBucket', and 'bucketRegion' to use s3 uploads.")
+    } else {
+      var done = this.async(),
+          s3Config = {
+            key : config.aws.awsKey,
+            secret : config.aws.awsPrivateKey,
+            bucket : config.aws.staticBucket,
+            region : config.aws.bucketRegion
+          }
+      if(process.env.NODE_ENV === 'production'){
+        s3Config.rootDir = '/' + packageInfo.version
+      }
+      helpers.uploadToS3(s3Config,workingDir + '/public',done)
+    }
+  })
+  // set up grunt task to merge mobile and web folders
+  grunt.registerTask('mergePublicFolders','merges requirejs generated public folders',function(){
+    console.log('merging generated public folders')
+    var done = this.async()
+    wrench.copyDirSyncRecursive(workingDir + '/public_web', workingDir + '/public')
+    wrench.copyDirSyncRecursive(__dirname + '/client/js/vendor', workingDir + '/public/js/vendor')
+    async.parallel([
+      helpers.copyFile.bind(helpers,workingDir + '/public_mobile/js/client.js',workingDir + '/public/js/client_mobile.js'),
+      helpers.copyFile.bind(helpers,workingDir + '/public_web/js/client.js',workingDir + '/public/js/client_web.js')
+    ],function(){
+      fs.unlink(workingDir + '/public/js/client.js',done)
+    })
   })
   
   // load up require plugin
@@ -86,7 +125,7 @@ module.exports = function(grunt) {
       urza_client : ['client/js/external/app.js','client/js/lib/**/*.js'],
       // client lint
       lib : [workingDir+'/*.js',workingDir+'/lib/**/*.js'],
-      client : [workingDir+'/client/js/**/*.js']
+      client : [workingDir+'/client/js/*.js', workingDir+'/client/js/lib/**/*.js']
     },
     jshint: {
       options: {
@@ -155,5 +194,5 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'lint');
-  grunt.registerTask('build', 'lint generateViewFiles requirejs:web requirejs:mobile removeScratchDir')
+  grunt.registerTask('build', 'lint generateViewFiles requirejs:web requirejs:mobile mergePublicFolders uploadToS3 cleanup')
 };

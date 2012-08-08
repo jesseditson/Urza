@@ -33,4 +33,16 @@ module.exports = function(program){
     
     grunt.tasks(['build'])
   });
+  
+  // lint command
+  program
+  .command('lint')
+  .description('Lints the current urza app.')
+  .action(function(type,info){
+    // set grunt's dir to the urza dir
+    grunt.file.setBase(__dirname + '/..')
+    setup()
+    
+    grunt.tasks(['default'])
+  })
 }
