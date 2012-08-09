@@ -156,7 +156,7 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
         // set up partials based on data attributes
         view.partials = {};
         var partials = view.$el.find('[data-partial]'),
-            partialsRendered = 0;
+            partialRendered = _.after(partials.length,done)
         partials.each(function(){
           // move all the partials to the partials object, and render them initially
           var p = $(this),
@@ -164,17 +164,18 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
               name : p.attr('data-partial'),
               url : p.attr('data-url'),
               obj : _.extend(data,getJSON(p.attr('data-obj'))),
-              el : p
+              el : p,
+              delay : p.attr('data-delay')
             }
           p.removeAttr('data-partial');
           p.removeAttr('data-url');
           p.removeAttr('data-obj');
-          render.call(this,partial.name,partial.url,partial.obj,partial.el,function(){
-            partialsRendered ++;
-            if(partialsRendered==partials.length){
-              done();
-            }
-          });
+          p.removeAttr('data-delay')
+          if(!partial.delay){
+            render.call(this,partial.name,partial.url,partial.obj,partial.el,partialRendered);
+          } else {
+            partialRendered()
+          }
         });
         // make data accessible.
         this.set("data",data);
