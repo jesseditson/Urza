@@ -160,18 +160,6 @@ if(require.main === module) {
   UrzaServer.prototype.createApp = function(){
     var app = express.createServer(),
         workingDir = helpers.getAppRoot()
-    if(this.environment === 'production'){
-      var clientFiles = { web : "", mobile : "", ready : false, readyCallbacks : [] }
-      async.map(['web','mobile'],function(type,done){
-        fs.readFile(workingDir + '/public_' + type + '/js/client.js','utf8',done)
-      },function(err,clients){
-        if(err) throw(err)
-        clientFiles.web = clients[0]
-        clientFiles.mobile = clients[1]
-        clientFiles.ready = true
-        clientFiles.readyCallbacks.forEach(function(cb){ cb() })
-      })
-    }
     // **Express app configuration**
     app.configure(function(){
       // basic express stuff
@@ -185,17 +173,6 @@ if(require.main === module) {
       app.use(useragent);
       // views.js - always compiled at runtime.
       app.use(viewsMiddleware);
-      if(this.environment === 'production'){
-        // serve prod client.js based on user agent
-        var getClient = function(req,res,next){
-          // only respond to requests for client.js
-          if(!req.url.match(/^\/js\/client\.js/)) return next()
-          // wait until we're ready
-          if(!clientFiles.ready) return clientFiles.readyCallbacks.push(getClient.bind(this,req,res,next))
-          res.send(req.isMobile ? clientFiles.mobile : clientFiles.web)
-        }
-        app.use(getClient)
-      }
       // static files
       var oneYear = 31557600000;
       if(this.environment == 'development'){

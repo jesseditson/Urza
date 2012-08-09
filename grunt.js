@@ -69,6 +69,7 @@ module.exports = function(grunt) {
     var done = this.async()
     wrench.copyDirSyncRecursive(workingDir + '/public_web', workingDir + '/public')
     wrench.copyDirSyncRecursive(__dirname + '/client/js/vendor', workingDir + '/public/js/vendor')
+    wrench.copyDirSyncRecursive(__dirname + '/client/js/external', workingDir + '/public/js/external')
     async.parallel([
       helpers.copyFile.bind(helpers,workingDir + '/public_mobile/js/client.js',workingDir + '/public/js/client_mobile.js'),
       helpers.copyFile.bind(helpers,workingDir + '/public_web/js/client.js',workingDir + '/public/js/client_web.js')
