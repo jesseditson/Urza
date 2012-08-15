@@ -245,7 +245,7 @@ if(require.main === module) {
       clientJs : function(req,res){
         var cdn = cdnUrl()
         if(!cdn) return 'client'
-        if(req.isMobile) return 'client_mobile'
+        if(req.isMobile===true) return 'client_mobile'
         return 'client_web'
       }
     });
