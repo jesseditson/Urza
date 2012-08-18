@@ -40,5 +40,5 @@
     "request": "2.9.x"
   },
   "optionalDependencies": {},
-  "bin": { "express": "./bin/urza" }
+  "bin": { "urza": "./bin/urza" }
 }
