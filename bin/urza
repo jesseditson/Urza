@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+// Urza command line script.
+// ---
+
+// TODO: add support back for create & delete
+
+// Dependencies
+// ------------
+var fs = require('fs'),
+    program = require('commander');
+
+// **Main Urza file. This does all sorts of handy tasks.**
+
+// Some setup stuff to get ready.
+var version = JSON.parse(fs.readFileSync(__dirname + '/../package.json')).version;
+
+// Command-Line App
+// ----------------
+
+// Set up our program:
+program.version(version);
+
+// Urza's Tasks
+// ------------
+
+// init
+require('../cli/init')(program)
+// create
+//require('../cli/create')(program)
+// remove
+//require('../cli/remove')(program)
+// build
+require('../cli/build')(program)
+
+if(process.argv.length < 3){
+  // show the help
+  process.argv.push('--help')
+}
+// Start it up
+program.parse(process.argv)
