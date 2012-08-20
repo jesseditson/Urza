@@ -4,7 +4,7 @@
 module.exports = function(program){
   program
     .command('init [appdir]')
-    .description('create a new Urza app')
+    .description('create a new Urza app in current directory')
     .action(function(appdir){
       if(!appdir){
         console.error('Error: You must tell me where to put your app! Try init <appname>');

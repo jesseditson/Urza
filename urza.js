@@ -202,6 +202,12 @@ UrzaServer.prototype.createApp = function(){
         if(!cdn) return 'client'
         if(req.isMobile===true) return 'client_mobile'
         return 'client_web'
+      },
+      publicJs : function(req,res){
+        var cdn = cdnUrl()
+        if(!cdn) return 'public'
+        if(req.isMobile===true) return 'public_mobile'
+        return 'public_web'
       }
     });
     return app;

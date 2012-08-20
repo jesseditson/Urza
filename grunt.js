@@ -46,20 +46,21 @@ module.exports = function(grunt) {
   })
   // set up grunt task to upload to s3
   grunt.registerTask('uploadToS3','uploads built public_web dir to S3',function(){
-    console.log('uploading public dir to S3')
+    var done = this.async()
     if(!config.aws){
       throw new Error("You must specify a 'config.aws' object with keys: 'awsPrivateKey', 'awsKey', 'staticBucket', and 'bucketRegion' to use s3 uploads.")
     } else {
-      var done = this.async(),
-          s3Config = {
+      var s3Config = {
             key : config.aws.awsKey,
             secret : config.aws.awsPrivateKey,
             bucket : config.aws.staticBucket,
             region : config.aws.bucketRegion
           }
+      s3Config = JSON.parse(JSON.stringify(s3Config))
       if(process.env.NODE_ENV === 'production'){
         s3Config.rootDir = '/' + packageInfo.version
       }
+      console.log(s3Config)
       helpers.uploadToS3(s3Config,workingDir + '/public',done)
     }
   })
@@ -76,9 +77,10 @@ module.exports = function(grunt) {
       helpers.copyFile.bind(helpers,workingDir + '/public_mobile/js/public.js',workingDir + '/public/js/public_mobile.js'),
       helpers.copyFile.bind(helpers,workingDir + '/public_web/js/public.js',workingDir + '/public/js/public_web.js')
     ],function(){
-      console.log('removing generic files')
-      fs.unlink(workingDir + '/public/js/client.js',done)
-      fs.unlink(workingDir + '/public/js/public.js',done)
+      async.parallel([
+        fs.unlink.bind(fs,workingDir + '/public/js/client.js'),
+        fs.unlink.bind(fs,workingDir + '/public/js/public.js')
+      ],done)
     })
   })
   

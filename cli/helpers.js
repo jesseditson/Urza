@@ -120,6 +120,7 @@ module.exports.uploadToS3 = function(options,filePath,callback){
   var uploads = {}
   if(filePath.match(/\.[\w\d]+$/)){
     // TODO: if passed filePath is a file, just put it up there.
+    console.error("I don't know how to upload single files yet.")
   } else {
     // build an object of files to upload
     walk(filePath,function(file,folderPath){
@@ -129,10 +130,6 @@ module.exports.uploadToS3 = function(options,filePath,callback){
       async.forEachLimit(Object.keys(uploads),100,function(fromPath,done){
         var toPath = uploads[fromPath]
         fs.readFile(fromPath,function(err,buf){
-          console.log(toPath,{
-  'Content-Length' : buf.length,
-  'Content-Type' : getFileType(toPath)
-})
           var req = client.put(toPath,{
             'Content-Length' : buf.length,
             'Content-Type' : getFileType(toPath)
