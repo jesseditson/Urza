@@ -72,9 +72,13 @@ module.exports = function(grunt) {
     wrench.copyDirSyncRecursive(__dirname + '/client/js/external', workingDir + '/public/js/external')
     async.parallel([
       helpers.copyFile.bind(helpers,workingDir + '/public_mobile/js/client.js',workingDir + '/public/js/client_mobile.js'),
-      helpers.copyFile.bind(helpers,workingDir + '/public_web/js/client.js',workingDir + '/public/js/client_web.js')
+      helpers.copyFile.bind(helpers,workingDir + '/public_web/js/client.js',workingDir + '/public/js/client_web.js'),
+      helpers.copyFile.bind(helpers,workingDir + '/public_mobile/js/public.js',workingDir + '/public/js/public_mobile.js'),
+      helpers.copyFile.bind(helpers,workingDir + '/public_web/js/public.js',workingDir + '/public/js/public_web.js')
     ],function(){
+      console.log('removing generic files')
       fs.unlink(workingDir + '/public/js/client.js',done)
+      fs.unlink(workingDir + '/public/js/public.js',done)
     })
   })
   
@@ -100,6 +104,10 @@ module.exports = function(grunt) {
       modules : [
         {
           name : "client",
+          exclude: ['jquery']
+        },
+        {
+          name : "public",
           exclude: ['jquery']
         }
       ]
