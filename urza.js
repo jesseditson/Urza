@@ -135,7 +135,7 @@ UrzaServer.prototype.createApp = function(){
     } else {
       // use web for any prod static files (unlikely case, but they're all the same except client and views anyway.
       // these files should be coming from a cdn.
-      app.use(gzippo.staticGzip(workingDir + '/public_web',{ maxAge: oneYear }));
+      app.use(gzippo.staticGzip(workingDir + '/client',{ maxAge: oneYear }));
     }
     // serve urza's client dir too
     app.use(gzippo.staticGzip(__dirname + '/client',{ maxAge: oneYear }));
