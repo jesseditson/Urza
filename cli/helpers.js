@@ -148,7 +148,7 @@ module.exports.uploadToS3 = function(options,filePath,callback){
           })
           req.on('response',function(res){
             if(res.statusCode == 200){
-              console.log('Finished Uploading %s',toPath)
+              console.log('Finished Uploading %s, content type %s',toPath,getFileType(toPath))
               done(null)
             } else if(res.statusCode == 404){
               done(new Error("Bucket not found."))
