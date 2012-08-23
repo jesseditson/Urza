@@ -97,8 +97,20 @@ var getFileType = function(file){
     case 'csv' :
       return 'text/csv'
       break
-    case 'xml' :
-      return 'text/xml'
+    case 'eot' :
+      return 'application/vnd.ms-fontobject'
+      break
+    case 'ttf' :
+      return 'font/ttf'
+      break
+    case 'otf' :
+      return 'font/opentype'
+      break
+    case 'woff' :
+      return 'font/x-woff'
+      break
+    case 'svg' :
+      return 'image/svg+xml'
       break
     default :
       return 'application/octet-stream'
