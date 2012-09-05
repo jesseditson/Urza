@@ -66,10 +66,11 @@ UrzaServer.prototype.cdnUrl = function(){
         return cdnHosts[a] - cdnHosts[b]
       })[0]
   cdnHosts[cdnPath] ++
+  cdnPath = cdnPath.replace(/\/$/,'')
   if(process.env.NODE_ENV == 'production'){
-    cdnPath += '/' + this.options.clientVersion || "unknown"
+    cdnPath += '/'  this.options.clientVersion || "unknown"
   }
-  return cdnPath.replace(/\/$/,'')
+  return cdnPath
 }
 
 // **Start Server**
@@ -161,7 +162,6 @@ UrzaServer.prototype.createApp = function(){
   app.configure('production', function(){
       // Be as quiet as possible during production errors
        app.use(express.errorHandler());
-       app.set('views',this.cdnUrl())
     }.bind(this));
     // add dynamic helpers
     this.configureHelpers(app);

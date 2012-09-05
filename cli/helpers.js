@@ -15,7 +15,7 @@ var appRoot
 var getAppRoot = module.exports.getAppRoot = function(dir){
   if(appRoot) return appRoot;
   // looks up the directory tree until it finds a folder with a .urza file.
-  dir = dir ? dir.replace(/\/[^\/]+$/,'') : process.env.PWD;
+  dir = dir ? dir.replace(/\/[^\/]+$/,'') : process.cwd();
   if(!dir.length){
     console.error('Urza app not found. Please run from inside an Urza app.');
     process.exit(1);
