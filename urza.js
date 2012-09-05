@@ -68,7 +68,7 @@ UrzaServer.prototype.cdnUrl = function(){
   cdnHosts[cdnPath] ++
   cdnPath = cdnPath.replace(/\/$/,'')
   if(process.env.NODE_ENV == 'production'){
-    cdnPath += '/'  this.options.clientVersion || "unknown"
+    cdnPath += '/' + this.options.clientVersion || "unknown"
   }
   return cdnPath
 }
