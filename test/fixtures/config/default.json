@@ -12,5 +12,5 @@
   "templates" : {
     "engine" : "handlebars"
   },
-  "schemadir" : "/test/fixtures/schemas"  
+  "schemadir" : "/test/fixtures/schemas"
 }

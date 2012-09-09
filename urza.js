@@ -251,7 +251,7 @@ UrzaServer.prototype.createApp = function(){
         if(err){
           res.json(err.message,500);
         } else {
-        res.json(response);
+          res.json(response);
         }
       });
     }.bind(this));

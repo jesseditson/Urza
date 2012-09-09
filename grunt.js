@@ -119,6 +119,24 @@ module.exports = function(grunt) {
   requireConfigs.mobile = JSON.parse(JSON.stringify(requireConfigs.web))
   requireConfigs.mobile.paths['lib/viewRoutes'] = scratchDir + '/views_mobile'
   requireConfigs.mobile.dir = workingDir + '/public_mobile'
+  
+  // set up lint file paths
+  var lintPaths = {
+    lib : [workingDir+'/*.js',workingDir+'/lib/**/*.js'],
+    client : [workingDir+'/client/js/*.js', workingDir+'/client/js/lib/**/*.js']
+  }
+  
+  // ignore lint on files specified in lintignore
+  var lintPath = workingDir + '/.lintignore',
+      lintignore = (fs.existsSync || path.existsSync)(lintPath) ? fs.readFileSync(lintPath,'utf8') : false
+  if(lintignore && lintignore.length){
+    var ignoreFiles = '!(' + lintignore.split(/\n/).join('|').replace(/\|$/,'') + ')'
+    var addIgnores = function(fp){
+      return fp.replace('*.js',ignoreFiles+'.js')
+    }
+    lintPaths.lib = lintPaths.lib.map(addIgnores)
+    lintPaths.client = lintPaths.client.map(addIgnores)
+  }
 
   // Project configuration.
   var gruntConfig = {
@@ -135,8 +153,8 @@ module.exports = function(grunt) {
       urza_lib: ['*.js','lib/**/*.js','test/**/*.js'],
       urza_client : ['client/js/external/app.js','client/js/lib/**/*.js'],
       // client lint
-      lib : [workingDir+'/*.js',workingDir+'/lib/**/*.js'],
-      client : [workingDir+'/client/js/*.js', workingDir+'/client/js/lib/**/*.js']
+      lib : lintPaths.lib,
+      client : lintPaths.client
     },
     jshint: {
       options: {
