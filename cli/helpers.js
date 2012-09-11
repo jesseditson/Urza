@@ -107,7 +107,7 @@ var getFileType = function(file){
       return 'font/opentype'
       break
     case 'woff' :
-      return 'font/x-woff'
+      return 'application/x-font-woff'
       break
     case 'svg' :
       return 'image/svg+xml'
