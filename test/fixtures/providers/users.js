@@ -6,7 +6,7 @@
 
 var async = require('async'),
     _ = require('underscore'),
-    config = require('config');
+    config = require('node-config-heroku');
 
 // Users Class
 // -----------------
