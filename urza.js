@@ -226,6 +226,15 @@ UrzaServer.prototype.createApp = function(){
           app.set('views',process.cwd()+ '/client/views');
           app.register('html',expressHandlebars);
           this.templatingEngine = expressHandlebars;
+          // register partials
+          var partialPath = process.cwd() + '/client/views/partials';
+          if (path.existsSync(partialPath)) {
+            fs.readdirSync(partialPath).forEach(function(partial, i) {
+              var name = partial.split('.')[0],
+                  contents = fs.readFileSync(partialPath+'/'+partial, 'utf8');
+              expressHandlebars.registerPartial(name, contents);
+            });
+          }
           break;
         default :
         throw new Error('Unknown templating engine specified: "'+this.options.templates.engine+'"');
