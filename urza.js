@@ -31,6 +31,7 @@ var logger = require('./lib/logging/logger.js'),
 var UrzaServer = module.exports.Server = function(options){
   this.options = options;
   this.environment = this.options.environment;
+  this.options.serverPort = process.env.PORT || options.serverPort
   this.api = new Api();
   this.app = this.createApp();
   this.cluster = cluster;
@@ -281,10 +282,10 @@ UrzaServer.prototype.createApp = function(){
     }.bind(this));
     // **View Route**
   // Renders a view
-    app.all('/view/:name',function(req,res,next){
-      data = {
-        data: req.body,
-        layout : false
+  app.all('/view/:name',function(req,res,next){
+    data = {
+      data: req.body,
+      layout : false
     };
     res.render(req.params.name,data);
   });
