@@ -13,7 +13,7 @@ module.exports = function(grunt) {
   var scratchDir = workingDir + '/__urza_scratch'
   // set up config dir so grunt will use the config client config.
   process.env.NODE_CONFIG_DIR = workingDir + '/config';
-  var config = require('node-config-heroku')
+  var config = require('config-heroku')
   var packageInfo = JSON.parse(fs.readFileSync(workingDir + '/package.json','utf8'))
   
   // set up grunt task to create scratch dir

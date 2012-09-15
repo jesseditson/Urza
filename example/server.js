@@ -1,6 +1,6 @@
 // Dependencies
 // ------------
-var config = require('node-config-heroku'),
+var config = require('config-heroku'),
     Server = require('urza').Server;
 
 // If you want to use authentication, add it to the config here, or in your config file.
