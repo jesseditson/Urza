@@ -287,7 +287,7 @@ UrzaServer.prototype.createApp = function(){
         });
       } else {
         res.render('partials/'+name,{layout:false});
-    }
+      }
     }.bind(this));
     // **View Route**
   // Renders a view
