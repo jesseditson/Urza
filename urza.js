@@ -166,6 +166,9 @@ UrzaServer.prototype.createApp = function(){
     }.bind(this));
     // add dynamic helpers
     this.configureHelpers(app);
+    app.server = this
+    // add middlewares array
+    this.renderMiddlewares = []
     // return the ready to .listen() app.
     return app;
   }
