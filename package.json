@@ -2,7 +2,7 @@
   "author": "Jesse Ditson <jesse.ditson@gmail.com>",
   "name": "urza",
   "description": "Urza is a node.js framework built for rapid development.",
-  "version": "0.1.4-1",
+  "version": "0.1.4-2",
   "repository": {
     "type": "git",
     "url": "git://github.com/jesseditson/Urza.git"
