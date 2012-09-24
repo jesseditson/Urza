@@ -260,6 +260,8 @@ UrzaServer.prototype.createApp = function(){
   UrzaServer.prototype.addRoutes = function(app){
     // **API Route**
     app.all("/api/*",function(req,res,next){
+      // iOS 6 POST caching fix
+      res.setHeader('Cache-Control','no-cache')
       this.callApi(req.params,req.session,req.body,function(err,response){
         if(err){
           res.json(err.message,500);
@@ -271,6 +273,8 @@ UrzaServer.prototype.createApp = function(){
     //**Partial Route**
     // renders a partial based on an api call
     app.all(/\/partial\/([^\/]+)\/?(.+)?/,function(req,res,next){
+      // iOS 6 POST caching fix
+      res.setHeader('Cache-Control','no-cache')
       // Note: this is all hacked together because express does not appear to support optional splats.
       // http://stackoverflow.com/questions/10020099/express-js-routing-optional-spat-param
       var params = req.params[1] ?[req.params[1]] : [],
@@ -295,6 +299,8 @@ UrzaServer.prototype.createApp = function(){
     // **View Route**
   // Renders a view
   app.all('/view/:name',function(req,res,next){
+    // iOS 6 POST caching fix
+    res.setHeader('Cache-Control','no-cache')
     data = {
       data: req.body,
       layout : false
@@ -313,6 +319,8 @@ UrzaServer.prototype.createApp = function(){
   // **404 Error Route**
   // this route always should go last, it will catch errors.
   app.all(/(.*)/,function(req,res){
+    // iOS 6 POST caching fix
+    res.setHeader('Cache-Control','no-cache')
     // TODO: make this prettier.
     res.send(404);
   });
