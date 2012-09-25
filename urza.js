@@ -179,7 +179,7 @@ UrzaServer.prototype.createApp = function(){
     var cdnUrl = this.cdnUrl.bind(this)
     // set up dynamic helpers - these will be available in the layout scope when pages are rendered.
     var cssCache,
-       buildTime = new Date().getTime(),
+        buildTime = new Date().getTime(),
         componentPath = process.cwd() + '/client/css/components',
         buster = (this.options.environment == 'production' ? this.options.clientVersion : buildTime)
   app.dynamicHelpers({
@@ -198,7 +198,7 @@ UrzaServer.prototype.createApp = function(){
       buildTime : function(req,res){
         return buster;
       },
-    cdn : function(req,res){
+      cdn : function(req,res){
         return cdnUrl()
       },
       clientJs : function(req,res){

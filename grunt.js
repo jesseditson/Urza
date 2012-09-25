@@ -86,6 +86,8 @@ module.exports = function(grunt) {
   
   // load up require plugin
   grunt.loadNpmTasks('grunt-requirejs');
+  // load up css plugin
+  grunt.loadNpmTasks('grunt-css');
   
   // Set up require conf
   var requireConfigs = {
@@ -137,7 +139,7 @@ module.exports = function(grunt) {
     lintPaths.lib = lintPaths.lib.map(addIgnores)
     lintPaths.client = lintPaths.client.map(addIgnores)
   }
-
+  
   // Project configuration.
   var gruntConfig = {
     pkg: '<json:package.json>',
@@ -217,11 +219,34 @@ module.exports = function(grunt) {
     }
   }
   
-  // TODO: concat + minify css
+  // css config stuff
+  if((fs.existsSync || path.existsSync)(workingDir + '/client/css/css.json')){
+    var cssFiles
+    var addCssPath = function(p){
+      return workingDir + '/client/css/' + p
+    }
+    try {
+      cssFiles = JSON.parse(fs.readFileSync(workingDir + '/client/css/css.json'))
+    } catch(e){
+      console.log('Could not find a css.json file in client/css - not concat & minifying css.')
+    }
+    if(cssFiles){
+      gruntConfig.cssmin = {
+        mobile : {
+          src : cssFiles.all.concat(cssFiles.mobile).map(addCssPath),
+          dest : workingDir + '/public/css/mobile.css'
+        },
+        web : {
+          src : cssFiles.all.concat(cssFiles.web).map(addCssPath),
+          dest : workingDir + '/public/css/web.css'
+        }
+      }
+    }
+  }
   
   grunt.initConfig(gruntConfig);
 
   // Default task.
   grunt.registerTask('default', 'lint');
-  grunt.registerTask('build', 'lint generateViewFiles requirejs:web requirejs:mobile mergePublicFolders uploadToS3 cleanup')
+  grunt.registerTask('build', 'lint generateViewFiles requirejs:web requirejs:mobile mergePublicFolders cssmin uploadToS3 cleanup')
 };
