@@ -243,10 +243,22 @@ module.exports = function(grunt) {
       }
     }
   }
+  // fix css image paths
+  grunt.registerTask('fixCssImagePaths','replaces all css image paths with ones relative to generated css files',function(){
+    var fixCssImagePaths = function(p){
+      var file = workingDir + '/public/css/'+p+'.css'
+      if(!(fs.existsSync || path.existsSync)(file)) return
+      var css = fs.readFileSync(file,'utf8')
+      css = css.replace(/url\((['"]?)(\.\.\/)*img/g,'url($1../img')
+      fs.writeFileSync(file,css,'utf8')
+    }
+    fixCssImagePaths('mobile')
+    fixCssImagePaths('web')
+  })
   
   grunt.initConfig(gruntConfig);
 
   // Default task.
   grunt.registerTask('default', 'lint');
-  grunt.registerTask('build', 'lint generateViewFiles requirejs:web requirejs:mobile mergePublicFolders cssmin uploadToS3 cleanup')
+  grunt.registerTask('build', 'lint generateViewFiles requirejs:web requirejs:mobile mergePublicFolders cssmin fixCssImagePaths uploadToS3 cleanup')
 };
