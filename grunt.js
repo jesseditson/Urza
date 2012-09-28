@@ -132,12 +132,14 @@ module.exports = function(grunt) {
   var lintPath = workingDir + '/.lintignore',
       lintignore = (fs.existsSync || path.existsSync)(lintPath) ? fs.readFileSync(lintPath,'utf8') : false
   if(lintignore && lintignore.length){
-    var ignoreFiles = '!(' + lintignore.split(/\n/).join('|').replace(/\|$/,'') + ')'
-    var addIgnores = function(fp){
-      return fp.replace('*.js',ignoreFiles+'.js')
+    var ignorePattern = new RegExp("(" + lintignore.split(/\n/).join('|').replace(/\|$/,'') + ")")
+    var addIgnores = function(paths){
+      return grunt.file.expandFiles(paths).filter(function(p){
+        return !ignorePattern.test(p)
+      })
     }
-    lintPaths.lib = lintPaths.lib.map(addIgnores)
-    lintPaths.client = lintPaths.client.map(addIgnores)
+    lintPaths.lib = addIgnores(lintPaths.lib)
+    lintPaths.client = addIgnores(lintPaths.client)
   }
   
   // Project configuration.
