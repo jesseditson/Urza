@@ -1,5 +1,6 @@
 /*global module:false*/
 module.exports = function(grunt) {
+  "use strict";
   // deps 
   var helpers = require('./cli/helpers'),
       fs = require('fs'),
@@ -184,6 +185,7 @@ module.exports = function(grunt) {
       },
       urza_lib : {
         options : {
+          strict : false,
           onecase : true,
           asi: true,
           loopfunc: true,
@@ -200,6 +202,7 @@ module.exports = function(grunt) {
       },
       lib : {
         options : {
+          strict : false,
           onecase : true,
           asi: true,
           loopfunc: true,
