@@ -202,6 +202,7 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
       data = {};
     }
     // add partial to view
+    if(!this.view.partials) this.view.partials = {}
     this.view.partials[partial] = {
       name : partial,
       url : api,
