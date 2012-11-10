@@ -1,8 +1,8 @@
 define(['jquery','vendor/require-backbone'],function($,Backbone){
   // Local Helpers
   // Render - renders partials from the server
-  var render = function(partial,api,data,el,callback){
-    $.ajax({
+  var render = function(partial,api,data,el,callback,options){
+    $.ajax(_.extend({
       url : '/partial/' + partial + '/' + api,
       data : data,
       type : 'post',
@@ -11,7 +11,7 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
         if(callback) callback(res);
         if(this.renderCallback) this.renderCallback.apply(this,arguments)
       },this)
-    });
+    },options));
   };
   var addMethods = function(view){
     // expose the navigate function on views
@@ -188,14 +188,14 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
     });
   }
   // render a view partial by name.
-  View.prototype.renderPartial = function(name,callback){
+  View.prototype.renderPartial = function(name,callback,options){
     var partial = this.view.partials[name];
     if(partial){
-      render.call(this,partial.name,partial.url,partial.obj,partial.el,callback);
+      render.call(this,partial.name,partial.url,partial.obj,partial.el,callback,options);
     }
   }
   // render a view or partial and return it
-  View.prototype.getView = function(partial,api,data,el,callback){
+  View.prototype.getView = function(partial,api,data,el,callback,options){
     if(!el && !callback){
       callback = data;
       el = null;
@@ -209,7 +209,7 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
       obj : data,
       el : el
     }
-    render.call(this,partial,api,data,el,callback);
+    render.call(this,partial,api,data,el,callback,options);
   }
   // remove the whole view.
   View.prototype.remove = function(){
