@@ -2,7 +2,7 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
   // Local Helpers
   // Render - renders partials from the server
   var render = function(partial,api,data,el,callback,options){
-    $.ajax(_.extend({
+    return $.ajax(_.extend({
       url : '/partial/' + partial + '/' + api,
       data : data,
       type : 'post',
@@ -191,7 +191,9 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
   View.prototype.renderPartial = function(name,callback,options){
     var partial = this.view.partials[name];
     if(partial){
-      render.call(this,partial.name,partial.url,partial.obj,partial.el,callback,options);
+      return render.call(this,partial.name,partial.url,partial.obj,partial.el,callback,options);
+    } else {
+      return false
     }
   }
   // render a view or partial and return it
@@ -209,7 +211,7 @@ define(['jquery','vendor/require-backbone'],function($,Backbone){
       obj : data,
       el : el
     }
-    render.call(this,partial,api,data,el,callback,options);
+    return render.call(this,partial,api,data,el,callback,options);
   }
   // remove the whole view.
   View.prototype.remove = function(){
